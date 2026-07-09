@@ -1,0 +1,6 @@
+{
+  "name": "Dicionário de Acordes de Teclado",
+  "description": "Dicionário interativo de acordes para teclado com visualização dinâmica de notas e intervalos.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
