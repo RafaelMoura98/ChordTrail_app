@@ -147,7 +147,7 @@ export function ChordInsightsPanel({
               >
                 <div className="space-y-1">
                   <div className="flex items-center gap-2">
-                    <span className="text-[10px] font-mono font-semibold bg-amber-500/10 text-amber-400 border border-amber-500/30 px-2 py-0.5 rounded-md">
+                    <span className="text-[10px] font-mono font-semibold bg-accent/10 text-accent border border-accent/30 px-2 py-0.5 rounded-md">
                       {tensao.label}: {tensao.noteName}
                     </span>
                     <span className="text-sm font-black text-zinc-100 font-mono">
@@ -203,7 +203,7 @@ export function ChordInsightsPanel({
                     <span className="text-[10px] font-mono font-semibold bg-purple-500/10 text-purple-400 border border-purple-500/30 px-2 py-0.5 rounded-md">
                       {sub.title}
                     </span>
-                    <span className="text-sm font-black text-amber-400 font-mono">
+                    <span className="text-sm font-black text-accent font-mono">
                       {sub.chordSymbol}
                     </span>
                   </div>
@@ -260,10 +260,10 @@ export function ChordInsightsPanel({
           </div>
 
           {/* DICA DE IMPROVISAÇÃO */}
-          <div className="bg-amber-500/10 border border-amber-500/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-amber-300 font-sans leading-relaxed">
-            <Lightbulb className="w-4 h-4 text-amber-400 shrink-0 mt-0.5" />
+          <div className="bg-accent/10 border border-accent/30 rounded-xl p-3 flex items-start gap-2.5 text-xs text-accent/80 font-sans leading-relaxed">
+            <Lightbulb className="w-4 h-4 text-accent shrink-0 mt-0.5" />
             <div>
-              <strong className="block text-amber-400 text-[11px] font-bold uppercase mb-0.5">Dica de Solo:</strong>
+              <strong className="block text-accent text-[11px] font-bold uppercase mb-0.5">Dica de Solo:</strong>
               {insights.escalaImproviso.tip}
             </div>
           </div>
