@@ -14,6 +14,7 @@ interface MoisesPdfUploaderProps {
   setShowChordInputText: (val: boolean) => void;
   playChordSynth: (notes: any[]) => void;
   companionActiveChordParsed: any;
+  style?: React.CSSProperties;
 }
 
 export function MoisesPdfUploader({
@@ -28,7 +29,8 @@ export function MoisesPdfUploader({
   showChordInputText,
   setShowChordInputText,
   playChordSynth,
-  companionActiveChordParsed
+  companionActiveChordParsed,
+  style
 }: MoisesPdfUploaderProps) {
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [isParsingPdf, setIsParsingPdf] = useState<boolean>(false);
@@ -143,17 +145,20 @@ export function MoisesPdfUploader({
   };
 
   return (
-    <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl p-5 sm:p-6 space-y-5 relative overflow-hidden group shadow-sm">
+    <div style={style} className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl pl-[12px] pr-[12px] pt-[12px] pb-[12px] mt-0 space-y-5 relative overflow-hidden group shadow-sm">
       <div className="absolute w-48 h-48 -top-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 relative z-10">
-        <div className="flex items-center gap-3">
+      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 relative z-10 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
+        <div 
+          style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '4px', marginRight: '4px', marginTop: '6px', marginBottom: '6px' }}
+          className="flex items-center gap-3 pl-[2px] pr-[2px] pt-[2px] pb-[2px] ml-0 mt-0"
+        >
           <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
             <Music className="w-5 h-5" />
           </div>
           <div>
             <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
+              <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono ml-[2px] mt-0 font-sans">
                 Esteira_de_Acordes // Moises_Companion
               </h3>
               {/* Tooltip de ajuda */}
@@ -166,7 +171,7 @@ export function MoisesPdfUploader({
                 </div>
               </div>
             </div>
-            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
+            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide ml-[2px] mt-0">
               Suba o PDF do Moises ou digite cifras para projetá-las na esteira de estudos
             </p>
           </div>
@@ -180,7 +185,8 @@ export function MoisesPdfUploader({
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
-          className={`border-2 border-dashed rounded-xl p-6 transition-all duration-300 text-center relative flex flex-col items-center justify-center min-h-[110px] ${
+          style={{ marginLeft: '8px', marginRight: '8px', marginTop: '8px', marginBottom: '8px', paddingLeft: '6px', paddingRight: '6px', paddingTop: '6px', paddingBottom: '6px' }}
+          className={`border-2 border-dashed rounded-xl pl-[20px] pr-[20px] pt-[15px] pb-[15px] cursor-pointer transition-all duration-300 text-center relative flex flex-col items-center justify-center min-h-[110px] ${
             isDragActive
               ? "border-accent bg-accent/5 shadow-[0_0_15px_rgba(0,255,170,0.15)]"
               : "border-white/10 bg-[#0d0d0e] hover:border-white/20"
@@ -204,7 +210,7 @@ export function MoisesPdfUploader({
               <div>
                 <p className="text-xs font-bold text-zinc-300">
                   Arraste o PDF do Moises aqui ou{" "}
-                  <label className="text-accent hover:underline cursor-pointer">
+                  <label className="text-accent hover:underline cursor-grab" style={{ cursor: 'grab' }}>
                     escolha um arquivo
                     <input
                       type="file"
@@ -229,23 +235,30 @@ export function MoisesPdfUploader({
         </div>
 
         {/* Collapsible Text Area Switch */}
-        <div className="flex items-center justify-between">
+        <div 
+          style={{ marginLeft: '4px', marginRight: '4px', marginTop: '8px', marginBottom: '8px', paddingTop: '8px', paddingBottom: '8px' }}
+          className="flex items-center justify-between pl-[4px] pr-[4px] pt-[2px] pb-[2px]"
+        >
           <button
             onClick={() => setShowChordInputText(!showChordInputText)}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0d0d0e] border border-white/5 hover:border-white/10 text-zinc-400 hover:text-zinc-200 text-xs transition-colors cursor-pointer"
+            style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', marginLeft: '6px', marginRight: '6px', marginTop: '3px', marginBottom: '3px' }}
+            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0d0d0e] border border-white/5 hover:border-white/10 text-zinc-400 hover:text-zinc-200 text-xs transition-colors cursor-pointer rounded-[8px] font-medium mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
           >
             <FileText className="w-4 h-4 text-accent/80" />
             <span>{showChordInputText ? "Ocultar Editor de Cifras" : "Editar / Digitar Cifras"}</span>
           </button>
 
           {/* Unique Chords / Compact Mode Toggle */}
-          <div className="flex items-center gap-2">
+          <div 
+            style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px', marginLeft: '6px', marginRight: '6px', marginTop: '3px', marginBottom: '3px' }}
+            className="flex items-center gap-2"
+          >
             <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wide">
               Modo Compacto (Únicos)
             </span>
             <button
               onClick={() => setCompanionUniqueOnly(!companionUniqueOnly)}
-              className={`p-1.5 rounded-lg border transition-all cursor-pointer ${
+              className={`p-1.5 rounded-lg border transition-all cursor-pointer rounded-[8px] mr-[2px] ml-[2px] mt-[2px] mb-[2px] ${
                 companionUniqueOnly
                   ? "bg-accent/15 border-accent text-accent shadow-[0_0_8px_rgba(0,255,170,0.1)]"
                   : "bg-[#0d0d0e] border-white/5 text-zinc-500 hover:text-zinc-300"
@@ -259,7 +272,7 @@ export function MoisesPdfUploader({
 
         {/* Text Area for manual chords editing */}
         {showChordInputText && (
-          <div className="space-y-1.5 animate-fade-in">
+          <div className="space-y-1.5 animate-fade-in pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
             <label className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono">
               Sequência de Cifras de Texto
             </label>
@@ -268,30 +281,39 @@ export function MoisesPdfUploader({
               onChange={(e) => setCompanionText(e.target.value)}
               rows={2}
               placeholder="Digite ou cole acordes separados por espaço (ex: C D G Em7)..."
-              className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl p-3.5 text-xs sm:text-sm text-accent font-mono focus:outline-none focus:border-accent transition-all resize-none placeholder:text-zinc-700 min-h-[64px]"
+              className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl pl-[10px] pr-[10px] pt-[10px] pb-[10px] text-xs sm:text-sm text-accent font-mono focus:outline-none focus:border-accent transition-all resize-none placeholder:text-zinc-700 min-h-[64px]"
             />
           </div>
         )}
 
         {/* Horizontal Chords Slider */}
         <div className="space-y-2">
-          <span className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono">
+          <span 
+            style={{ marginLeft: '6px', marginRight: '6px', marginTop: '6px', marginBottom: '6px', paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px' }}
+            className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono"
+          >
             Estação de Prática (Cliques ou Setas ◄ ► / Pedal)
           </span>
 
           {companionDisplayedChords.length === 0 ? (
-            <div className="py-5 text-center text-zinc-600 font-mono text-xs border border-dashed border-zinc-800 rounded-xl">
+            <div 
+              style={{ paddingTop: '12px', paddingBottom: '12px', marginTop: '8px', marginBottom: '8px', paddingLeft: '12px', paddingRight: '12px', marginLeft: '0px' }}
+              className="py-5 text-center text-zinc-600 font-mono text-xs border border-dashed border-zinc-800 rounded-xl"
+            >
               NENHUM ACORDE IMPORTADO OU DIGITADO
             </div>
           ) : (
-            <div className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent">
+            <div 
+              style={{ paddingTop: '12px', paddingBottom: '12px', marginTop: '8px', marginBottom: '8px', paddingLeft: '12px', paddingRight: '12px', marginLeft: '0px' }}
+              className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent pl-[4px] pr-[4px] pt-[6px] pb-[6px]"
+            >
               {companionDisplayedChords.map((chord, idx) => {
                 const isSelected = companionIndex === idx;
                 return (
                   <button
                     key={idx}
                     onClick={() => setCompanionIndex(idx)}
-                    className={`px-4 py-3 text-center rounded-xl border transition-all shrink-0 min-w-[70px] flex flex-col justify-center items-center cursor-pointer ${
+                    className={`text-center border transition-all shrink-0 min-w-[70px] flex flex-col justify-center items-center cursor-pointer rounded-[8px] pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[1px] ml-[1px] mt-[1px] mb-[1px] ${
                       isSelected
                         ? "bg-accent/15 border-accent text-accent shadow-[0_0_12px_rgba(0,255,170,0.18)] font-black scale-105"
                         : "bg-[#0d0d0e] border-white/5 text-zinc-400 hover:border-white/15 hover:text-zinc-100"
@@ -307,11 +329,15 @@ export function MoisesPdfUploader({
         </div>
 
         {/* Tactical Controls & Page Turner Info */}
-        <div className="flex items-center justify-between gap-4 pt-2">
+        <div 
+          style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '6px', marginRight: '6px', marginTop: '8px', marginBottom: '8px' }}
+          className="flex items-center justify-between gap-4 pt-2 pl-[2px] pr-[2px] pt-[2px] pb-[2px]"
+        >
           <button
             onClick={() => setCompanionIndex((prev) => (prev - 1 + companionDisplayedChords.length) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            className="flex-1 py-3.5 px-4 rounded-xl bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            style={{ width: '284px' }}
+            className="flex-1 rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
           >
             ◀ Anterior
           </button>
@@ -319,7 +345,8 @@ export function MoisesPdfUploader({
           <button
             onClick={() => playChordSynth(companionActiveChordParsed?.notes || [])}
             disabled={!companionActiveChordParsed}
-            className="px-5 py-3.5 rounded-xl bg-[#0d0d0e] border border-white/10 hover:border-accent/40 text-accent transition-all flex items-center justify-center min-h-[44px] disabled:opacity-40 cursor-pointer"
+            style={{ width: '44px' }}
+            className="rounded-[8px] bg-[#0d0d0e] border border-white/10 hover:border-accent/40 text-accent transition-all flex items-center justify-center min-h-[44px] disabled:opacity-40 cursor-pointer pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
             title="Ouvir som do acorde de referência"
           >
             <Volume2 className="w-5 h-5" />
@@ -328,13 +355,17 @@ export function MoisesPdfUploader({
           <button
             onClick={() => setCompanionIndex((prev) => (prev + 1) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            className="flex-1 py-3.5 px-4 rounded-xl bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer"
+            style={{ width: '284px' }}
+            className="flex-1 rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
           >
             Próximo ▶
           </button>
         </div>
 
-        <p className="text-[10px] text-zinc-500 font-mono uppercase tracking-wide text-center pt-1">
+        <p 
+          style={{ fontStyle: 'italic', textAlign: 'center' }}
+          className="text-[10px] text-zinc-500 font-mono uppercase tracking-wide text-center pt-1"
+        >
           💡 Dica: Use as setas do teclado ◄ e ► (ou seu pedal bluetooth de passar página) para navegar!
         </p>
       </div>

@@ -39,7 +39,11 @@ export function UnifiedInputPanel({
   handlePlayChordSynthFromSymbol
 }: UnifiedInputPanelProps) {
   return (
-    <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl p-5 sm:p-6 space-y-5 relative overflow-hidden group shadow-sm">
+    <div className="pl-[4px] pr-[4px] pt-[4px] pb-[4px]">
+      <div 
+        style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px' }}
+        className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl pl-[12px] pr-[12px] pt-[12px] pb-[12px] mt-0 space-y-5 relative overflow-hidden group shadow-sm"
+      >
       <div className="absolute w-48 h-48 -bottom-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
 
       <div className="flex items-center justify-between border-b border-zinc-800 pb-4 relative z-10">
@@ -47,11 +51,17 @@ export function UnifiedInputPanel({
           <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
             <Cpu className="w-5 h-5" />
           </div>
-          <div>
-            <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
+          <div style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', marginLeft: '0px', marginRight: '0px', marginTop: '0px' }}>
+            <h3 
+              style={{ marginTop: '8px', marginBottom: '8px', paddingTop: '6px', paddingBottom: '6px' }}
+              className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono"
+            >
               Conexao_Hardware // Inputs
             </h3>
-            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
+            <p 
+              style={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '2px', marginBottom: '8px', paddingLeft: '1px' }}
+              className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide"
+            >
               Ative seu Teclado MIDI USB ou Microfone de Áudio
             </p>
           </div>
@@ -59,10 +69,14 @@ export function UnifiedInputPanel({
       </div>
 
       {/* Selector Sub-Tabs */}
-      <div className="flex bg-[#0d0d0e] p-1 rounded-lg border border-white/5 relative z-10">
+      <div 
+        style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '0px' }}
+        className="flex bg-[#0d0d0e] pl-[4px] pr-[4px] pt-[4px] pb-[4px] rounded-lg border border-white/5 relative z-10"
+      >
         <button
           onClick={() => setInputMode('midi')}
-          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          style={{ paddingTop: '6px', paddingBottom: '6px', marginLeft: '6px', marginRight: '6px' }}
+          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer rounded-[8px] mr-[3px] ml-[3px] mt-[3px] mb-[3px] ${
             inputMode === 'midi'
               ? 'bg-accent text-zinc-950 shadow-sm font-black'
               : 'text-zinc-400 hover:text-zinc-100'
@@ -73,7 +87,8 @@ export function UnifiedInputPanel({
         </button>
         <button
           onClick={() => setInputMode('audio')}
-          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer ${
+          style={{ paddingTop: '6px', paddingBottom: '6px', paddingRight: '0px', marginLeft: '6px', marginRight: '6px' }}
+          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer rounded-[8px] mr-[3px] ml-[3px] mt-[3px] mb-[3px] ${
             inputMode === 'audio'
               ? 'bg-accent text-zinc-950 shadow-sm font-black'
               : 'text-zinc-400 hover:text-zinc-100'
@@ -109,14 +124,14 @@ export function UnifiedInputPanel({
             ) : (
               <div className="space-y-4">
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
-                  <div>
+                  <div className="pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
                     <label className="block text-[10px] uppercase font-bold text-zinc-500 mb-2 tracking-wider font-mono">
                       Hardware_MIDI_Ativo
                     </label>
                     <select
                       value={selectedMidiInputId}
                       onChange={(e) => setSelectedMidiInputId(e.target.value)}
-                      className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-zinc-200 font-mono focus:outline-none focus:border-accent cursor-pointer"
+                      className="w-full bg-[#0d0d0e] border border-white/10 rounded-[8px] pl-[10px] pr-[10px] pt-[8px] pb-[8px] text-xs text-zinc-200 font-mono focus:outline-none focus:border-accent cursor-pointer"
                     >
                       {midiInputs.map((input) => (
                         <option key={input.id} value={input.id} className="bg-[#161617]">
@@ -264,5 +279,6 @@ export function UnifiedInputPanel({
         )}
       </div>
     </div>
+  </div>
   );
 }

@@ -1,6 +1,6 @@
 import React, { useState, useEffect, useMemo, useRef } from 'react';
 import { 
-  Music, Volume2, Sparkles, Clock, Database, ListMusic, Youtube, 
+  Music, Volume2, Sparkles, Clock, Database, 
   Keyboard, RefreshCw, ChevronRight, Play, Pause, CheckCircle2,
   Wand2, Cpu, Loader2, ArrowRight, Eye, FastForward, Rewind, RotateCcw,
   Trash2, Plus, Filter, Search, Info, Zap, Mic, FileUp, Layers, Check, FileText
@@ -11,31 +11,6 @@ import { reharmonizeTimelineToJazz } from './utils/harmonyEngine';
 import { MoisesPdfUploader } from './components/MoisesPdfUploader';
 import { UnifiedInputPanel } from './components/UnifiedInputPanel';
 import { SyncFeedbackBanner } from './components/SyncFeedbackBanner';
-
-// Declaração do namespace global do YouTube Iframe API
-declare global {
-  interface Window {
-    YT: any;
-    onYouTubeIframeAPIReady: (() => void) | undefined;
-  }
-}
-
-// Estrutura de cada nó de acorde na linha do tempo sincronizada
-export interface SyncItem {
-  tempo: number;
-  cifra: string;
-}
-
-// Pacote de música completa salva no LocalStorage ('musicasSincronizadas')
-export interface SavedSong {
-  id: string;
-  title: string;
-  youtubeUrl: string;
-  linhaDoTempo: SyncItem[];
-  cifraOriginal?: string;
-  savedAt: string;
-  duracao?: number;
-}
 
 // Estrutura detalhada de notas musicais para acender no Teclado Piano
 export interface ParsedChordNote {
@@ -202,47 +177,7 @@ function extractChordsFromText(text: string): string[] {
   return extracted;
 }
 
-/**
- * EXTRAÇÃO DE ID DO YOUTUBE
- */
-function extractYouTubeId(url: string): string | null {
-  if (!url) return null;
-  const regExp = /^.*(youtu.be\/|v\/|u\/\w\/|embed\/|watch\?v=|\&v=)([^#\&\?]*).*/;
-  const match = url.match(regExp);
-  if (match && match[2].length === 11) {
-    return match[2];
-  }
-  if (url.trim().length === 11) {
-    return url.trim();
-  }
-  return null;
-}
 
-// Formatação de Segundos para MM:SS.ms
-function formatTime(seconds: number): string {
-  if (isNaN(seconds) || seconds < 0) return '0:00.0';
-  const mins = Math.floor(seconds / 60);
-  const secs = (seconds % 60).toFixed(1);
-  const secsPadded = parseFloat(secs) < 10 ? `0${secs}` : secs;
-  return `${mins}:${secsPadded}`;
-}
-
-/**
- * ALGORITMO DE BUSCA DO ACORDE ATIVO NA LINHA DO TEMPO
- */
-export function findActiveChordIndex(timeline: SyncItem[], currentTime: number): number {
-  if (!timeline || timeline.length === 0) return -1;
-
-  let activeIndex = -1;
-  for (let i = 0; i < timeline.length; i++) {
-    if (timeline[i].tempo <= currentTime) {
-      activeIndex = i;
-    } else {
-      break;
-    }
-  }
-  return activeIndex;
-}
 
 /**
  * CONVERSOR DE CIFRA PARA NOTAS MIDI
@@ -415,33 +350,6 @@ export function detectChordsFromMidi(midiNotes: number[]): {
   });
 }
 
-/**
- * LEITURA DAS MÚSICAS SALVAS DO LOCALSTORAGE ('musicasSincronizadas')
- * Sem presets fixos (Começa limpo por padrão conforme solicitado)
- */
-function loadSavedSongsFromStorage(): SavedSong[] {
-  try {
-    const stored = localStorage.getItem('musicasSincronizadas');
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      if (Array.isArray(parsed) && parsed.length > 0) {
-        return parsed.map((item: any, idx: number) => ({
-          id: item.id || `stored_${idx}_${Date.now()}`,
-          title: item.title || `Música Sincronizada #${idx + 1}`,
-          youtubeUrl: item.youtubeUrl || '',
-          linhaDoTempo: item.linhaDoTempo || [],
-          cifraOriginal: item.cifraOriginal || '',
-          savedAt: item.savedAt || 'Salvo no LocalStorage',
-          duracao: item.duracao || 0
-        }));
-      }
-    }
-  } catch (e) {
-    console.error('Erro ao carregar do localStorage', e);
-  }
-
-  return [];
-}
 
 /**
  * COMPONENTE REUTILIZÁVEL DE TECLADO PIANO (ISOLAMENTO DE ESTADOS)
@@ -456,20 +364,39 @@ interface PianoKeyboardProps {
   badgeText?: string;
   useFlats?: boolean;
   activeMidiNotes?: number[];
+  style?: React.CSSProperties;
+  numKeys?: number;
+  startMidi?: number;
+  fullWidth?: boolean;
 }
 
-function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, badgeText, useFlats = false, activeMidiNotes }: PianoKeyboardProps) {
+function PianoKeyboard({ 
+  idContainer, 
+  parsedChord, 
+  variant, 
+  title, 
+  subtitle, 
+  badgeText, 
+  useFlats = false, 
+  activeMidiNotes, 
+  style,
+  numKeys,
+  startMidi,
+  fullWidth = false
+}: PianoKeyboardProps) {
   const isCurrent = variant === 'current';
 
-  // Gerar as 28 teclas do piano (2 oitavas completas C3 -> E5)
+  const actualNumKeys = numKeys !== undefined ? numKeys : 28;
+  const actualStartMidi = startMidi !== undefined ? startMidi : 48; // Nota C3 padrão
+
+  // Gerar as teclas do piano
   const keys = useMemo(() => {
     const result = [];
     const scale = useFlats ? NOTES_FLAT : NOTES_SHARP;
-    const startMidi = 48; // Nota C3
 
-    for (let i = 0; i < 28; i++) {
-      const midi = startMidi + i;
-      const noteInOctave = i % 12;
+    for (let i = 0; i < actualNumKeys; i++) {
+      const midi = actualStartMidi + i;
+      const noteInOctave = midi % 12;
       const noteName = scale[noteInOctave];
       const isBlack = [1, 3, 6, 8, 10].includes(noteInOctave);
       const octave = Math.floor(midi / 12) - 1;
@@ -481,7 +408,13 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
 
       let isPressed = !!matchedNote;
       if (activeMidiNotes && activeMidiNotes.length > 0) {
-        isPressed = activeMidiNotes.includes(midi) || activeMidiNotes.some(mn => (mn % 12) === noteInOctave);
+        if (idContainer === 'midi-live-keyboard') {
+          // No teclado MIDI ao vivo, mostramos exatamente a tecla física pressionada pelo usuário, sem duplicatas oitavadas!
+          isPressed = activeMidiNotes.includes(midi);
+        } else {
+          // Nos demais teclados (Guia), permitimos o acendimento inteligente por oitavas caso necessário
+          isPressed = activeMidiNotes.includes(midi) || activeMidiNotes.some(mn => (mn % 12) === noteInOctave);
+        }
       }
 
       result.push({
@@ -494,23 +427,38 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
       });
     }
     return result;
-  }, [parsedChord, useFlats, activeMidiNotes]);
+  }, [parsedChord, useFlats, activeMidiNotes, actualNumKeys, actualStartMidi, idContainer]);
 
   return (
     <div 
       id={idContainer}
-      className={`rounded-2xl p-4 sm:p-5 border transition-all relative overflow-hidden group ${
-        isCurrent
-          ? 'bg-zinc-900/40 border-accent/40 shadow-[0_0_20px_rgba(0,255,170,0.1)] hover:border-accent/60'
-          : 'bg-zinc-900/40 border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.1)] hover:border-purple-500/60'
+      style={style}
+      className={`transition-all relative overflow-hidden group ${
+        fullWidth 
+          ? 'w-full rounded-none border-t border-x-0 border-b-0 p-4 sm:p-5 lg:px-8 bg-[#111112]/90 backdrop-blur-md border-zinc-800'
+          : `rounded-2xl p-4 sm:p-5 border ${
+              isCurrent
+                ? 'bg-zinc-900/40 border-accent/40 shadow-[0_0_20px_rgba(0,255,170,0.1)] hover:border-accent/60'
+                : 'bg-zinc-900/40 border-purple-500/40 shadow-[0_0_20px_rgba(168,85,247,0.1)] hover:border-purple-500/60'
+            }`
       }`}
     >
       {/* Luz Ambiente (Glow) */}
       <div className={`absolute w-48 h-48 -top-10 -right-10 rounded-full blur-3xl pointer-events-none ${isCurrent ? 'bg-accent/10' : 'bg-purple-500/10'}`}></div>
 
       {/* Header do Teclado */}
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3 gap-2 relative z-10">
-        <div className="flex items-center gap-2.5">
+      <div 
+        style={
+          idContainer === 'companion-live-keyboard'
+            ? { paddingTop: '4px', paddingBottom: '4px', marginTop: '4px', marginBottom: '4px' }
+            : undefined
+        }
+        className="flex items-center justify-between border-b border-zinc-800 pb-3 mb-3 gap-2 relative z-10"
+      >
+        <div 
+          className="flex items-center gap-2.5"
+          style={idContainer === 'keyboard-dictionary' ? { paddingLeft: '10px', paddingRight: '10px', paddingTop: '2px', paddingBottom: '2px' } : undefined}
+        >
           <div className={`p-2 rounded-xl border ${isCurrent ? 'bg-accent/10 text-accent border-accent/30' : 'bg-purple-500/10 text-purple-400 border-purple-500/30'}`}>
             <Keyboard className="w-4 h-4" />
           </div>
@@ -523,11 +471,18 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
         </div>
 
         {badgeText && (
-          <span className={`text-[10px] font-mono font-bold px-3 py-0.5 rounded-full border shrink-0 ${
-            isCurrent
-              ? 'bg-accent/10 text-accent border-accent/30 drop-shadow-[0_0_8px_rgba(0,255,170,0.8)]'
-              : 'bg-purple-500/10 text-purple-400 border-purple-500/30 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]'
-          }`}>
+          <span 
+            style={
+              idContainer === 'companion-live-keyboard' || idContainer === 'midi-live-keyboard'
+                ? { paddingLeft: '8px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px', marginLeft: '4px', marginRight: '4px', marginTop: '2px', marginBottom: '2px' }
+                : undefined
+            }
+            className={`text-[10px] font-mono font-bold px-3 py-0.5 rounded-full border shrink-0 ${
+              isCurrent
+                ? 'bg-accent/10 text-accent border-accent/30 drop-shadow-[0_0_8px_rgba(0,255,170,0.8)]'
+                : 'bg-purple-500/10 text-purple-400 border-purple-500/30 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]'
+            }`}
+          >
             {badgeText}
           </span>
         )}
@@ -535,7 +490,18 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
 
       {/* Renderização do Teclado Piano */}
       <div className="relative w-full overflow-x-auto no-scrollbar pb-1 relative z-10">
-        <div className={`relative flex w-full ${isCurrent ? 'h-32 sm:h-36 min-w-[520px]' : 'h-22 sm:h-26 min-w-[420px]'} bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 justify-center select-none`}>
+        <div 
+          className={`relative flex w-full ${isCurrent ? 'h-32 sm:h-36 min-w-[520px]' : 'h-22 sm:h-26 min-w-[420px]'} bg-zinc-950 p-1.5 rounded-xl border border-zinc-800 justify-center select-none`}
+          style={
+            idContainer === 'keyboard-dictionary' 
+              ? { height: '150px', width: '812px', paddingLeft: '6px', paddingRight: '6px', paddingTop: '1px', paddingBottom: '6px' }
+              : idContainer === 'companion-live-keyboard'
+              ? { marginTop: '0px', paddingTop: '2px', paddingBottom: '8px' }
+              : idContainer === 'midi-live-keyboard'
+              ? { paddingTop: '2px', paddingBottom: '8px', minWidth: '950px' }
+              : undefined
+          }
+        >
           {keys.map((key) => {
             if (key.isBlack) return null;
             const blackKeyAfter = keys.find(k => k.isBlack && k.midi === key.midi + 1);
@@ -557,7 +523,12 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
                       : 'bg-zinc-200 border-zinc-300 text-zinc-700 hover:bg-zinc-100'
                   }`}
                 >
-                  <span className={`${isCurrent ? 'text-[8px] sm:text-[9px]' : 'text-[7px]'} font-mono font-bold leading-none`}>{key.noteName}</span>
+                  <span 
+                    style={idContainer === 'keyboard-dictionary' ? { marginBottom: '5px', fontSize: '10px' } : undefined}
+                    className={`${isCurrent ? 'text-[8px] sm:text-[9px]' : 'text-[7px]'} font-mono font-bold leading-none`}
+                  >
+                    {key.noteName}
+                  </span>
                 </div>
 
                 {/* Tecla Preta */}
@@ -575,7 +546,12 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
                         : 'bg-zinc-900 border-zinc-950 text-zinc-400'
                     }`}
                   >
-                    <span className={`${isCurrent ? 'text-[7px]' : 'text-[6px]'} font-mono leading-none`}>{blackKeyAfter.noteName}</span>
+                    <span 
+                      style={idContainer === 'keyboard-dictionary' ? { marginBottom: '5px', fontSize: '8px' } : undefined}
+                      className={`${isCurrent ? 'text-[7px]' : 'text-[6px]'} font-mono leading-none`}
+                    >
+                      {blackKeyAfter.noteName}
+                    </span>
                   </div>
                 )}
               </div>
@@ -586,15 +562,24 @@ function PianoKeyboard({ idContainer, parsedChord, variant, title, subtitle, bad
 
       {/* Legenda de Cores */}
       <div className="flex items-center justify-between text-[10px] font-sans text-zinc-400 pt-1 relative z-10">
-        <span className="flex items-center gap-1.5">
+        <span 
+          className="flex items-center gap-1.5"
+          style={idContainer === 'keyboard-dictionary' ? { paddingLeft: '10px', paddingRight: '10px', paddingTop: '2px', paddingBottom: '2px' } : undefined}
+        >
           <span className={`w-2 h-2 rounded-full ${isCurrent ? 'bg-accent' : 'bg-fuchsia-400'}`}></span>
           Tônica
         </span>
-        <span className="flex items-center gap-1.5">
+        <span 
+          className="flex items-center gap-1.5"
+          style={idContainer === 'keyboard-dictionary' ? { paddingLeft: '10px', paddingRight: '10px', paddingTop: '2px', paddingBottom: '2px' } : undefined}
+        >
           <span className={`w-2 h-2 rounded-full ${isCurrent ? 'bg-accent/80' : 'bg-purple-400'}`}></span>
           Notas
         </span>
-        <span className={`font-mono font-bold ${isCurrent ? 'text-accent drop-shadow-[0_0_8px_rgba(0,255,170,0.8)]' : 'text-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]'}`}>
+        <span 
+          className={`font-mono font-bold ${isCurrent ? 'text-accent drop-shadow-[0_0_8px_rgba(0,255,170,0.8)]' : 'text-purple-400 drop-shadow-[0_0_8px_rgba(192,132,252,0.8)]'}`}
+          style={idContainer === 'keyboard-dictionary' ? { paddingLeft: '10px', paddingRight: '10px', paddingTop: '2px', paddingBottom: '2px' } : undefined}
+        >
           {parsedChord ? parsedChord.cifraOriginal : 'Aguardando...'}
         </span>
       </div>
@@ -622,19 +607,6 @@ export default function App() {
   const [detectedNoteName, setDetectedNoteName] = useState<string>('');
   const [detectedConfidence, setDetectedConfidence] = useState<number>(0);
 
-  // Músicas Salvas no LocalStorage
-  const [savedSongs, setSavedSongs] = useState<SavedSong[]>([]);
-  const [selectedSongId, setSelectedSongId] = useState<string>('');
-
-  // Música Selecionada Atual
-  const currentSong = useMemo(() => {
-    return savedSongs.find(s => s.id === selectedSongId) || savedSongs[0] || null;
-  }, [savedSongs, selectedSongId]);
-
-  const currentSongRef = useRef<SavedSong | null>(currentSong);
-  useEffect(() => {
-    currentSongRef.current = currentSong;
-  }, [currentSong]);
 
   // --- MODO CONEXÃO MIDI & DETECÇÃO EM TEMPO REAL ---
   const [midiAccess, setMidiAccess] = useState<any>(null);
@@ -693,29 +665,6 @@ export default function App() {
     };
   }, [midiAccess, selectedMidiInputId]);
 
-  // --- MODO REPRODUÇÃO & DUPLO TECLADO VISUAL ---
-  const [playbackCurrentTime, setPlaybackCurrentTime] = useState<number>(0);
-  const [isPlayingVideo, setIsPlayingVideo] = useState<boolean>(false);
-  const [activeChordIndex, setActiveChordIndex] = useState<number>(-1);
-  const [activeChordParsed, setActiveChordParsed] = useState<ParsedChord | null>(null);
-  const [nextChordParsed, setNextChordParsed] = useState<ParsedChord | null>(null);
-
-  // Refs de Controle do Player do YouTube
-  const ytPlaybackPlayerRef = useRef<any>(null);
-  const playbackIntervalRef = useRef<any>(null);
-  const activeChordIndexRef = useRef<number>(-1);
-
-  // --- MODO SINCRONIZAÇÃO AUTOMÁTICA POR IA ---
-  const [aiUrlInput, setAiUrlInput] = useState<string>('https://www.youtube.com/watch?v=LkW3b-uK2iE');
-  const [aiTitleInput, setAiTitleInput] = useState<string>('Minha Música');
-  const [aiCifraInput, setAiCifraInput] = useState<string>(`[Intro] C  G/B  Am  F\nC               G/B             Am\nComo Zaqueu, eu quero subir o mais alto\n          F\nSó pra te ver, olhar para Ti`);
-  
-  // Estados do Loader Progressivo de IA
-  const [isAnalyzingAi, setIsAnalyzingAi] = useState<boolean>(false);
-  const [aiProgressPercent, setAiProgressPercent] = useState<number>(0);
-  const [aiStatusMessage, setAiStatusMessage] = useState<string>('');
-  const [aiSuccessResult, setAiSuccessResult] = useState<string | null>(null);
-
   // --- DICIONÁRIO DE ACORDES E FILTROS ---
   const [selectedRoot, setSelectedRoot] = useState<RootNote>('C');
   const [selectedVariation, setSelectedVariation] = useState<VariationName>('Maior');
@@ -730,135 +679,12 @@ export default function App() {
   // --- SISTEMA DE NOTIFICAÇÃO TOAST & INSIGHTS IA ---
   const [toastNotification, setToastNotification] = useState<string | null>(null);
 
-  /**
-   * REARMONIZAÇÃO DE TRILHA EM ESTILO JAZZ
-   */
-  const handleReharmonizeCurrentSongToJazz = () => {
-    if (!currentSong || !currentSong.linhaDoTempo || currentSong.linhaDoTempo.length === 0) {
-      alert('Nenhuma música selecionada para rearmonizar.');
-      return;
-    }
-
-    const novaLinhaDoTempo = reharmonizeTimelineToJazz(currentSong.linhaDoTempo);
-    const updatedSong: SavedSong = {
-      ...currentSong,
-      linhaDoTempo: novaLinhaDoTempo
-    };
-
-    const novaLista = savedSongs.map(s => s.id === currentSong.id ? updatedSong : s);
-    setSavedSongs(novaLista);
-    localStorage.setItem('musicasSincronizadas', JSON.stringify(novaLista));
-
-    if (activeChordIndex >= 0 && novaLinhaDoTempo[activeChordIndex]) {
-      setActiveChordParsed(parseChordSymbolToNotes(novaLinhaDoTempo[activeChordIndex].cifra));
-    }
-    if (activeChordIndex + 1 < novaLinhaDoTempo.length) {
-      setNextChordParsed(parseChordSymbolToNotes(novaLinhaDoTempo[activeChordIndex + 1].cifra));
-    }
-
-    setToastNotification(`🎷 Cifra rearmonizada! ${novaLinhaDoTempo.length} acordes foram enriquecidos com tétrades e nonas de Jazz.`);
-    setTimeout(() => setToastNotification(null), 4000);
-  };
-
-  /**
-   * EXPERIMENTAÇÃO RÁPIDA DE ACORDES SUGERIDOS NO PAINEL DE INSIGHTS
-   */
-  const handleSelectChordForExperiment = (symbol: string) => {
-    const parsed = parseChordSymbolToNotes(symbol);
-    if (parsed) {
-      setActiveChordParsed(parsed);
-      setToastNotification(`🎯 Testando acorde [${symbol}] no Teclado Principal`);
-      setTimeout(() => setToastNotification(null), 3000);
-    }
-  };
-
   const handlePlayChordSynthFromSymbol = (symbol: string) => {
     const parsed = parseChordSymbolToNotes(symbol);
     if (parsed && parsed.notes) {
       playChordSynth(parsed.notes);
     }
   };
-
-  // Carregar Músicas Salvas na Inicialização
-  useEffect(() => {
-    const list = loadSavedSongsFromStorage();
-    setSavedSongs(list);
-    if (list.length > 0) {
-      setSelectedSongId(list[0].id);
-    }
-  }, []);
-
-  /**
-   * REINICIALIZAÇÃO / RESET DO LOCALSTORAGE
-   */
-  const handleResetLocalStorage = () => {
-    if (confirm('Deseja excluir todas as músicas sincronizadas e limpar o LocalStorage?')) {
-      localStorage.removeItem('musicasSincronizadas');
-      setSavedSongs([]);
-      setSelectedSongId('');
-      setActiveChordParsed(null);
-      setNextChordParsed(null);
-      setActiveChordIndex(-1);
-      alert('LocalStorage limpo com sucesso.');
-    }
-  };
-
-  /**
-   * REQUISITO 3: SISTEMA DE PLAYBACK OTIMIZADO PARA TRANSIÇÃO DE ESTADOS
-   * Loop de 100ms que monitora o tempo do player do YouTube, encontra o Nó Ativo (Current Chord)
-   * e o Nó Seguinte (Next Chord), e aciona a renderização dos dois teclados.
-   */
-  const startPlaybackMonitoring = () => {
-    stopPlaybackMonitoring();
-
-    playbackIntervalRef.current = setInterval(() => {
-      const player = ytPlaybackPlayerRef.current;
-      if (player && typeof player.getCurrentTime === 'function') {
-        const time = player.getCurrentTime();
-        setPlaybackCurrentTime(time);
-
-        const song = currentSongRef.current;
-        if (!song || !song.linhaDoTempo || song.linhaDoTempo.length === 0) return;
-
-        // Identifica o índice do nó ativo atual no tempo do vídeo
-        const newActiveIndex = findActiveChordIndex(song.linhaDoTempo, time);
-
-        // TRIGGER CONTROL: Atualiza os dois teclados apenas quando muda de nó
-        if (newActiveIndex !== activeChordIndexRef.current) {
-          activeChordIndexRef.current = newActiveIndex;
-          setActiveChordIndex(newActiveIndex);
-
-          // 1) ACORDE ATUAL (Teclado Principal Central)
-          if (newActiveIndex >= 0 && song.linhaDoTempo[newActiveIndex]) {
-            const currentChordStr = song.linhaDoTempo[newActiveIndex].cifra;
-            setActiveChordParsed(parseChordSymbolToNotes(currentChordStr));
-          } else {
-            setActiveChordParsed(null);
-          }
-
-          // 2) PRÓXIMO ACORDE (Teclado de Preparação no Painel Superior Direito)
-          const nextIndex = newActiveIndex + 1;
-          if (nextIndex < song.linhaDoTempo.length) {
-            const nextChordStr = song.linhaDoTempo[nextIndex].cifra;
-            setNextChordParsed(parseChordSymbolToNotes(nextChordStr));
-          } else {
-            setNextChordParsed(null);
-          }
-        }
-      }
-    }, 100);
-  };
-
-  const stopPlaybackMonitoring = () => {
-    if (playbackIntervalRef.current) {
-      clearInterval(playbackIntervalRef.current);
-      playbackIntervalRef.current = null;
-    }
-  };
-
-  useEffect(() => {
-    return () => stopPlaybackMonitoring();
-  }, []);
 
   // --- ARRASTE E SOLTE E LEITURA DE PDF (MOISES COORDES) ---
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
@@ -1205,194 +1031,7 @@ export default function App() {
     };
   }, []);
 
-  /**
-   * CONTROLES MANUAIS DO PLAYER DE VÍDEO DO YOUTUBE
-   */
-  const togglePlayPauseVideo = () => {
-    const player = ytPlaybackPlayerRef.current;
-    if (player && typeof player.getPlayerState === 'function') {
-      const state = player.getPlayerState();
-      // 1 = PLAYING
-      if (state === 1) {
-        player.pauseVideo();
-        setIsPlayingVideo(false);
-      } else {
-        player.playVideo();
-        setIsPlayingVideo(true);
-      }
-    }
-  };
 
-  const seekVideoBy = (secondsOffset: number) => {
-    const player = ytPlaybackPlayerRef.current;
-    if (player && typeof player.getCurrentTime === 'function') {
-      const current = player.getCurrentTime() || 0;
-      const target = Math.max(0, current + secondsOffset);
-      player.seekTo(target, true);
-    }
-  };
-
-  const handleSeekToTimestamp = (tempo: number) => {
-    const player = ytPlaybackPlayerRef.current;
-    if (player && typeof player.seekTo === 'function') {
-      player.seekTo(tempo, true);
-      player.playVideo();
-      setIsPlayingVideo(true);
-    }
-  };
-
-  /**
-   * INICIALIZAÇÃO DO PLAYER DO YOUTUBE (MODO REPRODUÇÃO)
-   */
-  useEffect(() => {
-    if (activeTab !== 'playback' || !currentSong) return;
-
-    const videoId = extractYouTubeId(currentSong.youtubeUrl);
-    if (!videoId) return;
-
-    // Reset de estados
-    activeChordIndexRef.current = -1;
-    setActiveChordIndex(-1);
-    setActiveChordParsed(null);
-
-    // Ajusta o acorde inicial
-    if (currentSong.linhaDoTempo.length > 0) {
-      setNextChordParsed(parseChordSymbolToNotes(currentSong.linhaDoTempo[0].cifra));
-    }
-
-    const initPlaybackPlayer = () => {
-      if (window.YT && window.YT.Player) {
-        try {
-          ytPlaybackPlayerRef.current = new window.YT.Player('playback-player', {
-            events: {
-              'onReady': () => {
-                // Player pronto
-              },
-              'onStateChange': (event: any) => {
-                if (event.data === window.YT.PlayerState.PLAYING) {
-                  setIsPlayingVideo(true);
-                  startPlaybackMonitoring();
-                } else {
-                  setIsPlayingVideo(false);
-                  if (event.data === window.YT.PlayerState.PAUSED || event.data === window.YT.PlayerState.ENDED) {
-                    stopPlaybackMonitoring();
-                  }
-                }
-              }
-            }
-          });
-        } catch (e) {
-          console.log('Iframe API attaching attempt', e);
-        }
-      }
-    };
-
-    if (!window.YT) {
-      const tag = document.createElement('script');
-      tag.src = 'https://www.youtube.com/iframe_api';
-      const firstScriptTag = document.getElementsByTagName('script')[0];
-      firstScriptTag?.parentNode?.insertBefore(tag, firstScriptTag);
-      window.onYouTubeIframeAPIReady = () => {
-        initPlaybackPlayer();
-      };
-    } else {
-      setTimeout(initPlaybackPlayer, 200);
-    }
-  }, [activeTab, selectedSongId, currentSong]);
-
-  /**
-   * REQUISITO 1: INTERFACE COM O MODELO DE IA (SIMULAÇÃO DE ANÁLISE DE ÁUDIO)
-   * Extração do ID do YouTube, envio conceitual para API Gemini / Espectral,
-   * e distribuição inteligente dos acordes ao longo do tempo.
-   */
-  const analisarMusicaComIA = async () => {
-    setAiSuccessResult(null);
-
-    const videoId = extractYouTubeId(aiUrlInput);
-    if (!videoId) {
-      alert('Por favor, informe um Link válido do YouTube!');
-      return;
-    }
-
-    const acordesExtraidos = extractChordsFromText(aiCifraInput);
-    if (acordesExtraidos.length === 0) {
-      alert('Nenhum acorde válido foi localizado no texto da cifra fornecido.');
-      return;
-    }
-
-    setIsAnalyzingAi(true);
-    setAiProgressPercent(0);
-    setAiStatusMessage('0% - Baixando stream de áudio do YouTube...');
-
-    // Passo 1: Download de Stream (0% -> 30%)
-    await new Promise(resolve => setTimeout(resolve, 800));
-    setAiProgressPercent(30);
-    setAiStatusMessage('30% - Analisando transientes, batidas e BPM...');
-
-    // Passo 2: Análise Espectral e Frequências (30% -> 65%)
-    await new Promise(resolve => setTimeout(resolve, 1000));
-    setAiProgressPercent(65);
-    setAiStatusMessage('65% - Mapeando frequências cromáticas e trocas de compasso...');
-
-    // Passo 3: Distribuição Rítmica Inteligente (65% -> 100%)
-    await new Promise(resolve => setTimeout(resolve, 900));
-
-    // Duração estimada da música (210 segundos ou 3m30s)
-    const duracaoTotalEmSegundos = 210;
-    const offsetInicial = 3.5;
-    const tempoUtil = Math.max(duracaoTotalEmSegundos - 10.0, 30.0);
-    const intervaloEntreAcordes = tempoUtil / acordesExtraidos.length;
-
-    const novaLinhaDoTempo: SyncItem[] = acordesExtraidos.map((cifra, idx) => {
-      const tempoCalculado = offsetInicial + (idx * intervaloEntreAcordes);
-      return {
-        tempo: parseFloat(tempoCalculado.toFixed(1)),
-        cifra: cifra
-      };
-    });
-
-    setAiProgressPercent(100);
-    setAiStatusMessage('100% - Acordes sincronizados com sucesso pela IA!');
-
-    const novaMusicaIA: SavedSong = {
-      id: `ai_song_${Date.now()}`,
-      title: aiTitleInput.trim() || `Música IA #${savedSongs.length + 1}`,
-      youtubeUrl: aiUrlInput,
-      linhaDoTempo: novaLinhaDoTempo,
-      cifraOriginal: aiCifraInput,
-      savedAt: new Date().toLocaleDateString('pt-BR'),
-      duracao: duracaoTotalEmSegundos
-    };
-
-    // Gravação no LocalStorage com chave 'musicasSincronizadas'
-    try {
-      let listaAtual = loadSavedSongsFromStorage();
-      listaAtual = [novaMusicaIA, ...listaAtual];
-      localStorage.setItem('musicasSincronizadas', JSON.stringify(listaAtual));
-
-      const atualizada = loadSavedSongsFromStorage();
-      setSavedSongs(atualizada);
-      setSelectedSongId(novaMusicaIA.id);
-
-      setAiSuccessResult(`A IA sincronizou ${novaLinhaDoTempo.length} acordes ao longo da música!`);
-    } catch (e) {
-      console.error('Erro ao gravar no localStorage', e);
-    }
-
-    setIsAnalyzingAi(false);
-  };
-
-  // Excluir uma única música
-  const handleDeleteSong = (idToDelete: string) => {
-    if (confirm('Deseja excluir esta música salva?')) {
-      const novaLista = savedSongs.filter(s => s.id !== idToDelete);
-      localStorage.setItem('musicasSincronizadas', JSON.stringify(novaLista));
-      setSavedSongs(novaLista);
-      if (selectedSongId === idToDelete) {
-        setSelectedSongId(novaLista.length > 0 ? novaLista[0].id : '');
-      }
-    }
-  };
 
   // CÁLCULOS E FILTROS DO DICIONÁRIO DE ACORDES
   const filteredRootNotes = useMemo(() => {
@@ -1528,10 +1167,10 @@ export default function App() {
     return parseChordSymbolToNotes(`${derivedMidiRoot}${suffix}`);
   }, [derivedMidiRoot, midiGuideVariation]);
 
-  const videoIdForPlayback = currentSong ? extractYouTubeId(currentSong.youtubeUrl) : null;
-
   return (
-    <div className="min-h-screen bg-[#0d0d0e] text-[#e0e0e0] flex flex-col font-sans overflow-x-hidden selection:bg-accent selection:text-zinc-950">
+    <div 
+      className="min-h-screen bg-[#0d0d0e] text-[#e0e0e0] flex flex-col font-sans overflow-x-hidden selection:bg-accent selection:text-zinc-950"
+    >
       
       {/* Top Header */}
       <header className="h-16 border-b-2 border-white/10 bg-[#0d0d0e] sticky top-0 z-50 flex items-center justify-center px-4 sm:px-8">
@@ -1560,7 +1199,7 @@ export default function App() {
               }`}
             >
               <Layers className="w-4 h-4 shrink-0" />
-              <span>Estação Moises + MIDI</span>
+              <span>Modo Moises | MIDI</span>
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-zinc-950 border border-white/10 rounded-lg text-[10px] text-zinc-300 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl font-mono normal-case tracking-normal">
                 Workspace integrado de acordes, PDF Moises e inputs de microfone/MIDI
               </div>
@@ -1582,23 +1221,26 @@ export default function App() {
             </button>
           </div>
 
-          {/* Quantidade de Músicas */}
-          <div className="hidden md:flex items-center gap-2 text-[10px] font-mono uppercase">
-            <span className="text-zinc-500">LIBRA_STAT:</span>
-            <span className="text-accent font-bold">[{savedSongs.length.toString().padStart(2, '0')}_SAVED]</span>
-          </div>
+
         </div>
       </header>
 
       {/* --- ABA 1: UNIFIED WORKSPACE (MOISES COMPANION + MIDI CONNECTION) --- */}
       {activeTab === 'companion' && (
-        <main 
-          className="flex-1 w-full max-w-[1295px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto"
-        >
-          <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full col-span-12">
+        <div className="flex-1 w-full flex flex-col overflow-y-auto bg-[#0d0d0e] min-h-0">
+          <main 
+            className="w-full max-w-[1295px] mx-auto p-4 sm:p-6 pb-2 grid grid-cols-1 lg:grid-cols-12 gap-6 shrink-0"
+          >
+            <div 
+              style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px' }}
+              className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full col-span-12"
+            >
             
             {/* COLUNA ESQUERDA (7 cols): Esteira de Acordes, PDF Moises, Teclados e Feedbacks */}
-            <section className="lg:col-span-7 space-y-6 animate-fade-in">
+            <div 
+              style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px' }}
+              className="lg:col-span-7 space-y-6 animate-fade-in"
+            >
               
               {/* Moises PDF Uploader & Chords Conveyor */}
               <MoisesPdfUploader
@@ -1626,6 +1268,7 @@ export default function App() {
                   subtitle={`Posicionamento correto das notas e intervalos de ${companionActiveChordSymbol}`}
                   badgeText="GUIA DE REFERÊNCIA"
                   useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(companionActiveChordParsed.rootNote)}
+                  style={{ paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}
                 />
               ) : (
                 <div className="p-8 bg-[#161617] border border-white/5 rounded-xl text-center font-mono text-zinc-500 text-xs">
@@ -1638,24 +1281,13 @@ export default function App() {
                 isChordMatched={isChordMatched}
                 midiNotesPressed={midiNotesPressed}
                 activeChordSymbol={companionActiveChordSymbol || 'Sem Acorde'}
+                style={{ marginLeft: '6px', marginRight: '6px', marginTop: '10px', marginBottom: '10px', paddingTop: '8px', paddingBottom: '8px', paddingRight: '18px', paddingLeft: '18px' }}
               />
 
-              {/* Teclado MIDI ao Vivo */}
-              <PianoKeyboard
-                idContainer="midi-live-keyboard"
-                parsedChord={null}
-                variant="current"
-                title="Teclado MIDI ao Vivo"
-                subtitle="Notas acendem em tempo real ao pressionar as teclas do teclado controlador USB"
-                badgeText={midiNotesPressed.length > 0 ? `${midiNotesPressed.length} TECLAS ATIVAS` : 'CONTROLADOR OFFLINE'}
-                activeMidiNotes={midiNotesPressed}
-                useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(companionActiveChordParsed?.rootNote || 'C')}
-              />
-
-            </section>
+            </div>
 
             {/* COLUNA DIREITA (5 cols): Painel de Dispositivos Hardware & Variações Harmônicas */}
-            <section className="lg:col-span-5 space-y-6 animate-fade-in">
+            <div className="lg:col-span-5 space-y-6 animate-fade-in">
               
               {/* Painel Unificado de Entrada de Hardware (MIDI & Microfone) */}
               <UnifiedInputPanel
@@ -1681,7 +1313,10 @@ export default function App() {
                 <div className="absolute w-48 h-48 -top-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
                 
                 <div className="border-b border-zinc-800 pb-4 relative z-10 flex flex-col sm:flex-row sm:items-center justify-between gap-3">
-                  <div className="flex items-center gap-3">
+                  <div 
+                    style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px' }}
+                    className="flex items-center gap-3"
+                  >
                     <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
                       <Sparkles className="w-5 h-5 text-accent" />
                     </div>
@@ -1696,7 +1331,10 @@ export default function App() {
                   </div>
 
                   {/* Manual selector override */}
-                  <div className="flex items-center gap-1 bg-[#0d0d0e] border border-white/10 rounded-lg p-1 overflow-x-auto max-w-full">
+                  <div 
+                    style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px', marginLeft: '4px', marginRight: '4px', marginTop: '2px', marginBottom: '2px' }}
+                    className="flex items-center gap-1 bg-[#0d0d0e] border border-white/10 rounded-lg p-1 overflow-x-auto max-w-full"
+                  >
                     {['C', 'D', 'E', 'F', 'G', 'A', 'B'].map((r) => (
                       <button
                         key={r}
@@ -1715,29 +1353,36 @@ export default function App() {
 
                 {/* Grid de Variações */}
                 <div className="space-y-3 relative z-10">
-                  <span className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono block">
+                  <span 
+                    style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '0px', marginTop: '2px', marginBottom: '2px' }}
+                    className="text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono block"
+                  >
                     Abra uma variação de {midiGuideRoot} no Teclado Guia ou escute seu som:
                   </span>
                   
-                  <div className="grid grid-cols-2 sm:grid-cols-3 gap-2">
-                    {Object.keys(chordsData.variacoes).slice(0, 12).map((varKey) => {
+                  <div 
+                    style={{ paddingLeft: '6px', paddingRight: '6px', paddingBottom: '8px', paddingTop: '8px', marginLeft: '4px', marginRight: '4px', marginTop: '2px', marginBottom: '2px' }}
+                    className="grid grid-cols-2 sm:grid-cols-3 gap-2"
+                  >
+                    {Object.keys(chordsData.variacoes).slice(0, 12).map((varKey, idx) => {
                       const suffix = VARIATION_DISPLAY_SUFFIX[varKey] !== undefined ? VARIATION_DISPLAY_SUFFIX[varKey] : varKey;
                       const variationSymbol = `${midiGuideRoot}${suffix}`;
                       const isCurrentlyActive = companionActiveChordSymbol === variationSymbol;
+
                       return (
                         <div
                           key={varKey}
-                          className={`p-2.5 rounded-xl border transition-all flex flex-col justify-between gap-2.5 ${
+                          className={`p-3 rounded-xl border transition-all flex flex-col justify-between gap-3 ${
                             isCurrentlyActive
                               ? 'bg-accent/10 border-accent text-accent shadow-[0_0_8px_rgba(0,255,170,0.1)]'
-                              : 'bg-[#0d0d0e] border-white/5 text-zinc-400'
+                              : 'bg-[#0d0d0e] border-white/5 text-zinc-400 hover:border-zinc-800/40'
                           }`}
                         >
                           <div className="flex items-center justify-between gap-1.5">
-                            <span className="text-xs font-bold font-mono tracking-wider">{variationSymbol}</span>
+                            <span className="text-xs font-bold font-mono tracking-wider truncate" title={variationSymbol}>{variationSymbol}</span>
                             <button
                               onClick={() => handlePlayChordSynthFromSymbol(variationSymbol)}
-                              className="p-1 rounded-lg bg-[#161617] border border-white/5 text-zinc-400 hover:text-accent hover:border-accent/40 transition-colors cursor-pointer"
+                              className="p-1 rounded-lg bg-[#161617] border border-white/5 text-zinc-400 hover:text-accent hover:border-accent/40 transition-colors cursor-pointer shrink-0"
                               title="Ouvir"
                             >
                               <Volume2 className="w-3.5 h-3.5" />
@@ -1760,14 +1405,33 @@ export default function App() {
 
               </div>
 
-            </section>
+            </div>
 
           </div>
         </main>
-      )}
+
+        {/* TECLADO MIDI AO VIVO (LARGURA TOTALMENTE COMPLETA DA TELA, SEM DIVS DE CONTENÇÃO QUE RESTRINGEM A LARGURA) */}
+        <div className="w-full animate-fade-in mt-auto shrink-0">
+          <PianoKeyboard
+            idContainer="midi-live-keyboard"
+            parsedChord={null}
+            variant="current"
+            title="Teclado MIDI ao Vivo (61 Teclas)"
+            subtitle="Notas acendem em tempo real ao pressionar as teclas do teclado controlador USB (C2 a C7)"
+            badgeText={midiNotesPressed.length > 0 ? `${midiNotesPressed.length} TECLAS ATIVAS` : 'CONTROLADOR OFFLINE'}
+            activeMidiNotes={midiNotesPressed}
+            useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(companionActiveChordParsed?.rootNote || 'C')}
+            numKeys={61}
+            startMidi={36}
+            fullWidth={true}
+            style={{ width: '100%', margin: 0 }}
+          />
+        </div>
+      </div>
+    )}
 
       {/* --- ABA DE REPRODUÇÃO VELHA DESATIVADA --- */}
-      {activeTab === 'companion_old_disable' && (
+      {false && (
         <main 
           className="flex-1 w-full max-w-[1295px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto"
         >
@@ -2473,15 +2137,25 @@ export default function App() {
       {/* --- ABA 3: DICIONÁRIO COMPLETO DE ACORDES E FILTROS --- */}
       {activeTab === 'dictionary' && (
         <main 
+          style={{ marginLeft: '30px', paddingLeft: '0px' }}
           className="flex-1 w-full max-w-[1295px] mx-auto p-4 sm:p-6 lg:p-8 overflow-y-auto flex flex-col items-center justify-center"
         >
-          <div className="w-full space-y-6 my-auto">
+          <div 
+            style={{ marginLeft: '25px' }}
+            className="w-full space-y-6 my-auto"
+          >
             
             {/* SEÇÃO DE FILTROS E BUSCA */}
-            <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-none p-5 sm:p-7 space-y-5 shadow-sm relative overflow-hidden group">
+            <div 
+              className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors p-5 sm:p-7 space-y-5 shadow-sm relative overflow-hidden group"
+              style={{ borderRadius: '12px', marginLeft: '0px', marginRight: '0px', paddingLeft: '0px', marginTop: '20px', marginBottom: '15px' }}
+            >
             <div className="absolute w-64 h-64 -top-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
             
-            <div className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b-2 border-white/10 pb-4 relative z-10 text-center sm:text-left">
+            <div 
+              className="flex flex-col sm:flex-row items-center justify-between gap-4 border-b-2 border-white/10 pb-4 relative z-10 text-center sm:text-left"
+              style={{ paddingLeft: '12px', paddingRight: '24px', paddingTop: '8px', paddingBottom: '8px' }}
+            >
               <div className="flex items-center justify-center sm:justify-start gap-2.5">
                 <div className="p-2 bg-[#0d0d0e] border border-accent/20 text-accent">
                   <Filter className="w-4 h-4" />
@@ -2500,15 +2174,27 @@ export default function App() {
                   onChange={(e) => setSearchQuery(e.target.value)}
                   placeholder="Buscar cifra (ex: m7, add9)..."
                   className="w-full bg-[#0d0d0e] border border-white/10 rounded-none pl-10 pr-4 py-2.5 text-xs sm:text-sm text-zinc-100 font-mono focus:outline-none focus:border-accent transition-all placeholder:text-zinc-700 min-h-[42px]"
+                  style={{ borderRadius: '12px', paddingLeft: '35px', paddingRight: '12px', paddingTop: '2px', paddingBottom: '2px' }}
                 />
               </div>
             </div>
 
             {/* FILTRO 1: GRUPO DE NOTAS FUNDAMENTAIS */}
             <div className="space-y-3 relative z-10">
-              <div className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider">
-                <span className="text-zinc-500 font-bold text-center sm:text-left text-[11px]">1. Nota Fundamental (Tônica):</span>
-                <div className="flex items-center justify-center gap-1 bg-[#0d0d0e] p-1 rounded-lg border border-white/10 text-xs">
+              <div 
+                className="flex flex-col sm:flex-row items-center justify-between gap-2 text-xs sm:text-sm font-mono uppercase tracking-wider"
+                style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px' }}
+              >
+                <span 
+                  className="text-zinc-500 font-bold text-center sm:text-left text-[11px]"
+                  style={{ fontStyle: 'italic', color: '#00A769' }}
+                >
+                  1. Nota Fundamental (Tônica):
+                </span>
+                <div 
+                  className="flex items-center justify-center gap-1 bg-[#0d0d0e] p-1 rounded-lg border border-white/10 text-xs"
+                  style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '2px', paddingBottom: '2px' }}
+                >
                   {(['Todas', 'Naturais', 'Acidentes'] as const).map(grp => (
                     <button
                       key={grp}
@@ -2516,6 +2202,7 @@ export default function App() {
                       className={`px-3 py-1.5 rounded-lg font-bold font-mono text-[10px] uppercase tracking-wider transition-all duration-300 ease-out hover:scale-[1.04] hover:brightness-110 active:scale-[0.97] min-h-[30px] border ${
                         rootGroupFilter === grp ? 'bg-accent text-zinc-950 border-accent' : 'text-zinc-400 border-transparent hover:text-white'
                       }`}
+                      style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px' }}
                     >
                       {grp}
                     </button>
@@ -2524,7 +2211,10 @@ export default function App() {
               </div>
 
               {/* Botões de Notas Fundamentais Ampliados e Centralizados */}
-              <div className="flex flex-wrap justify-center gap-2 ml-0 rounded-xl border border-white/10 p-2">
+              <div 
+                className="flex flex-wrap justify-center gap-2 ml-0 border border-white/10"
+                style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '16px', paddingBottom: '16px', borderRadius: '0px' }}
+              >
                 {filteredRootNotes.map((note) => (
                   <button
                     key={note}
@@ -2544,10 +2234,16 @@ export default function App() {
             {/* FILTRO 2: MODO (MAIOR / MENOR) */}
             {selectedRoot && (
               <div className="space-y-3 pt-3 border-t border-white/10 relative z-10 transition-all duration-500">
-                <span className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left">
+                <span 
+                  className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left"
+                  style={{ fontStyle: 'italic', color: '#00A769', paddingLeft: '12px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px' }}
+                >
                   2. Modo (Maior / Menor):
                 </span>
-                <div className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono">
+                <div 
+                  className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono"
+                  style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '12px' }}
+                >
                   {(['Todos', 'Maior', 'Menor'] as const).map((mode) => (
                     <button
                       key={mode}
@@ -2557,6 +2253,7 @@ export default function App() {
                           ? 'bg-accent text-zinc-950 border-accent shadow-[0_0_12px_rgba(0,255,170,0.3)] hover:shadow-[0_0_18px_rgba(0,255,170,0.45)]'
                           : 'bg-[#0d0d0e] text-zinc-300 border-white/10 hover:border-accent/40 hover:text-accent'
                       }`}
+                      style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px' }}
                     >
                       {mode === 'Todos' ? 'Todos os Modos' : mode}
                     </button>
@@ -2567,8 +2264,16 @@ export default function App() {
 
             {/* FILTRO 3: CATEGORIA DE VARIAÇÃO */}
             <div className="space-y-3 pt-3 border-t border-white/10 relative z-10">
-              <span className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left">3. Categoria da Variação:</span>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono">
+              <span 
+                className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left"
+                style={{ fontStyle: 'italic', color: '#00A769', paddingLeft: '12px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                3. Categoria da Variação:
+              </span>
+              <div 
+                className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono"
+                style={{ paddingTop: '12px', paddingBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}
+              >
                 {['Todas', 'Tríades', 'Tétrades & Sétimas', 'Sextas & Nonas', 'Suspensos & Alterados'].map((cat) => (
                   <button
                     key={cat}
@@ -2578,6 +2283,7 @@ export default function App() {
                         ? 'bg-accent text-zinc-950 border-accent shadow-[0_0_12px_rgba(0,255,170,0.3)] hover:shadow-[0_0_18px_rgba(0,255,170,0.45)]'
                         : 'bg-[#0d0d0e] text-zinc-300 border-white/10 hover:border-accent/40 hover:text-accent'
                     }`}
+                    style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px' }}
                   >
                     {cat}
                   </button>
@@ -2587,10 +2293,16 @@ export default function App() {
 
             {/* BOTÕES DE SELEÇÃO DA VARIAÇÃO */}
             <div className="space-y-3 pt-3 border-t border-white/10 relative z-10">
-              <span className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left">
+              <span 
+                className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left"
+                style={{ fontStyle: 'italic', color: '#00A769', paddingLeft: '12px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
                 4. Variação Harmônica do Acorde:
               </span>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2">
+              <div 
+                className="flex flex-wrap justify-center sm:justify-start gap-2"
+                style={{ borderRadius: '12px', paddingLeft: '35px', paddingRight: '35px', paddingTop: '20px', paddingBottom: '20px', marginLeft: '0px' }}
+              >
                 {filteredVariations.map((varName) => (
                   <button
                     key={varName}
@@ -2609,8 +2321,16 @@ export default function App() {
 
             {/* FILTRO 5: INVERSÃO DO ACORDE */}
             <div className="space-y-3 pt-3 border-t border-white/10 relative z-10">
-              <span className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left">5. Inversão do Acorde:</span>
-              <div className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono">
+              <span 
+                className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left"
+                style={{ fontStyle: 'italic', color: '#00A769', paddingLeft: '12px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px' }}
+              >
+                5. Inversão do Acorde:
+              </span>
+              <div 
+                className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono"
+                style={{ paddingTop: '10px', paddingBottom: '10px', paddingLeft: '12px', paddingRight: '12px' }}
+              >
                 {['Fundamental (0ª)', '1ª Inversão', '2ª Inversão', '3ª Inversão'].map((label, idx) => (
                   <button
                     key={idx}
@@ -2620,6 +2340,7 @@ export default function App() {
                         ? 'bg-accent text-zinc-950 border-accent shadow-[0_0_12px_rgba(0,255,170,0.3)] hover:shadow-[0_0_18px_rgba(0,255,170,0.45)]'
                         : 'bg-[#0d0d0e] text-zinc-300 border-white/10 hover:border-accent/40 hover:text-accent'
                     }`}
+                    style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '6px', paddingBottom: '6px' }}
                   >
                     {label}
                   </button>
@@ -2634,11 +2355,22 @@ export default function App() {
             
             {/* Esquerda (7 cols): Piano + Ouvir Som */}
             <div className="lg:col-span-7 space-y-4">
-              <div className="bg-[#161617] border-2 border-accent/60 hover:border-accent transition-colors rounded-xl p-5 sm:p-6 space-y-4 shadow-sm relative overflow-hidden group">
+              <div 
+                className="bg-[#161617] border-2 border-accent/60 hover:border-accent transition-colors rounded-xl space-y-4 shadow-sm relative overflow-hidden group"
+                style={{ marginTop: '16px', marginBottom: '16px', marginLeft: '8px', marginRight: '8px', paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px' }}
+              >
                 <div className="flex flex-wrap items-center justify-between gap-3">
                   <div>
-                    <span className="text-[10px] text-zinc-500 font-mono uppercase font-bold tracking-wider">Acorde Selecionado</span>
-                    <h3 className="text-3xl sm:text-4xl font-black text-accent font-mono">
+                    <span 
+                      className="text-[10px] text-zinc-500 font-mono uppercase font-bold tracking-wider"
+                      style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '4px', paddingBottom: '4px' }}
+                    >
+                      Acorde Selecionado
+                    </span>
+                    <h3 
+                      className="text-3xl sm:text-4xl font-black text-accent font-mono"
+                      style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '2px', paddingBottom: '4px', marginTop: '0px', marginBottom: '0px' }}
+                    >
                       {selectedRoot}{selectedVariation}
                       {inversion > 0 && <span className="text-xs text-zinc-400 ml-2 font-mono uppercase font-bold">({inversion}ª Inversão)</span>}
                     </h3>
@@ -2648,6 +2380,7 @@ export default function App() {
                     onClick={() => playChordSynth(chordNotes)}
                     disabled={isPlayingSynth}
                     className="px-5 py-2.5 sm:py-3 rounded-none bg-accent/10 text-accent border border-accent/30 text-xs font-bold font-mono uppercase tracking-widest hover:bg-accent hover:text-zinc-950 transition-all flex items-center gap-2 active:scale-[0.98] min-h-[44px]"
+                    style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '6px', paddingBottom: '6px', marginRight: '12px', marginLeft: '12px', borderRadius: '10px' }}
                   >
                     <Volume2 className="w-4 h-4 sm:w-5 sm:h-5 text-accent" />
                     <span>{isPlayingSynth ? 'Tocando...' : 'Ouvir Acorde'}</span>
@@ -2667,7 +2400,10 @@ export default function App() {
 
             {/* Direita (5 cols): Tabela Harmônica com Frequências e Intervalos */}
             <div className="lg:col-span-5 space-y-4">
-              <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl p-5 sm:p-6 space-y-3.5 shadow-sm relative overflow-hidden group">
+              <div 
+                className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl space-y-3.5 shadow-sm relative overflow-hidden group"
+                style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px', marginLeft: '8px', marginRight: '8px', marginTop: '16px', marginBottom: '16px' }}
+              >
                 <h4 className="text-xs sm:text-sm font-bold uppercase tracking-widest text-accent font-mono flex items-center gap-2 border-b border-white/10 pb-2.5">
                   <Info className="w-4 h-4 text-accent" />
                   Estrutura Harmônica
