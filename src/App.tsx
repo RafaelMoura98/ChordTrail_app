@@ -3,7 +3,7 @@ import {
   Music, Volume2, Sparkles, Clock, Database, 
   Keyboard, RefreshCw, ChevronRight, Play, Pause, CheckCircle2,
   Wand2, Cpu, Loader2, ArrowRight, Eye, FastForward, Rewind, RotateCcw,
-  Trash2, Plus, Filter, Search, Info, Zap, Mic, FileUp, Layers, Check, FileText
+  Trash2, Plus, Filter, Search, Info, Zap, FileUp, Layers, Check, FileText
 } from 'lucide-react';
 import chordsData from './data/chords.json';
 import { ChordInsightsPanel } from './components/ChordInsightsPanel';
@@ -599,13 +599,7 @@ export default function App() {
   const [isParsingPdf, setIsParsingPdf] = useState<boolean>(false);
   const [pdfParseError, setPdfParseError] = useState<string | null>(null);
   const [showChordInputText, setShowChordInputText] = useState<boolean>(false);
-  const [inputMode, setInputMode] = useState<'midi' | 'audio'>('midi');
 
-  // Detector de Áudio via Microfone (Web Audio API)
-  const [isAudioDetecting, setIsAudioDetecting] = useState<boolean>(false);
-  const [detectedFrequency, setDetectedFrequency] = useState<number>(-1);
-  const [detectedNoteName, setDetectedNoteName] = useState<string>('');
-  const [detectedConfidence, setDetectedConfidence] = useState<number>(0);
 
 
   // --- MODO CONEXÃO MIDI & DETECÇÃO EM TEMPO REAL ---
@@ -880,156 +874,7 @@ export default function App() {
     };
   }, [activeTab, companionDisplayedChords.length]);
 
-  // --- DETECTOR DE ÁUDIO EM TEMPO REAL (WEB AUDIO API) ---
-  const audioContextRef = useRef<AudioContext | null>(null);
-  const analyserRef = useRef<AnalyserNode | null>(null);
-  const mediaStreamSourceRef = useRef<MediaStreamAudioSourceNode | null>(null);
-  const rafIdRef = useRef<number | null>(null);
-
-  // Algoritmo de Autocorrelação para encontrar a frequência fundamental mais forte
-  const autoCorrelate = (buffer: Float32Array, sampleRate: number): number => {
-    const SIZE = buffer.length;
-    let r1 = 0;
-    let r2 = SIZE - 1;
-
-    // Remove ruídos de sinal muito baixo (Noise gate)
-    for (let i = 0; i < SIZE / 2; i++) {
-      if (Math.abs(buffer[i]) < 0.015) r1 = i;
-      else break;
-    }
-    for (let i = SIZE - 1; i >= SIZE / 2; i--) {
-      if (Math.abs(buffer[i]) < 0.015) r2 = i;
-      else break;
-    }
-
-    const buf = buffer.subarray(r1, r2);
-    const len = buf.length;
-    if (len < 256) return -1; // Sinal muito fraco ou curto
-
-    let rms = 0;
-    for (let i = 0; i < len; i++) {
-      const val = buf[i];
-      rms += val * val;
-    }
-    rms = Math.sqrt(rms / len);
-    if (rms < 0.015) return -1; // Silêncio
-
-    let bestOffset = -1;
-    let bestCorrelation = 0;
-
-    let lastCorrelation = 1;
-    const correlations = new Float32Array(len);
-
-    for (let offset = 0; offset < len; offset++) {
-      let correlation = 0;
-      for (let i = 0; i < len - offset; i++) {
-        correlation += buf[i] * buf[i + offset];
-      }
-      correlation = correlation / (len - offset);
-      correlations[offset] = correlation;
-
-      if (offset > 0 && correlation > correlations[offset - 1] && lastCorrelation <= correlations[offset - 1]) {
-        if (correlation > bestCorrelation) {
-          bestCorrelation = correlation;
-          bestOffset = offset;
-        }
-      }
-      lastCorrelation = correlation;
-    }
-
-    if (bestCorrelation > 0.35 && bestOffset !== -1) {
-      const frequency = sampleRate / bestOffset;
-      return frequency;
-    }
-    return -1;
-  };
-
-  const frequencyToMidiNote = (frequency: number): number => {
-    return Math.round(12 * Math.log2(frequency / 440) + 69);
-  };
-
-  const startAudioDetection = async () => {
-    try {
-      const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-      const AudioCtx = window.AudioContext || (window as any).webkitAudioContext;
-      const audioCtx = new AudioCtx();
-      const analyser = audioCtx.createAnalyser();
-      analyser.fftSize = 2048;
-
-      const source = audioCtx.createMediaStreamSource(stream);
-      source.connect(analyser);
-
-      audioContextRef.current = audioCtx;
-      analyserRef.current = analyser;
-      mediaStreamSourceRef.current = source;
-      setIsAudioDetecting(true);
-
-      const bufferLength = analyser.fftSize;
-      const dataArray = new Float32Array(bufferLength);
-
-      const checkPitch = () => {
-        if (!analyserRef.current) return;
-        analyserRef.current.getFloatTimeDomainData(dataArray);
-        
-        const frequency = autoCorrelate(dataArray, audioCtx.sampleRate);
-        if (frequency !== -1 && frequency > 55 && frequency < 1000) {
-          // Frequência musical válida (de A1 até B5 aproximadamente)
-          const midiNote = frequencyToMidiNote(frequency);
-          const pitchClass = midiNote % 12;
-          const noteName = NOTES_SHARP[pitchClass];
-          const octave = Math.floor(midiNote / 12) - 1;
-
-          setDetectedFrequency(frequency);
-          setDetectedNoteName(`${noteName}${octave}`);
-          setDetectedConfidence(Math.round(80 + Math.random() * 15)); // Confiança simulada baseada na força do sinal
-
-          // Altera a nota de referência para as variações harmônicas sugeridas
-          setMidiGuideRoot(noteName);
-        }
-
-        rafIdRef.current = requestAnimationFrame(checkPitch);
-      };
-
-      rafIdRef.current = requestAnimationFrame(checkPitch);
-    } catch (err) {
-      console.error('Erro ao acessar o microfone para detecção de áudio:', err);
-      alert('Não foi possível acessar o seu microfone. Certifique-se de dar permissão ao navegador.');
-    }
-  };
-
-  const stopAudioDetection = () => {
-    setIsAudioDetecting(false);
-    if (rafIdRef.current) {
-      cancelAnimationFrame(rafIdRef.current);
-      rafIdRef.current = null;
-    }
-    if (mediaStreamSourceRef.current) {
-      mediaStreamSourceRef.current.disconnect();
-      mediaStreamSourceRef.current = null;
-    }
-    if (audioContextRef.current) {
-      audioContextRef.current.close();
-      audioContextRef.current = null;
-    }
-    analyserRef.current = null;
-    setDetectedFrequency(-1);
-    setDetectedNoteName('');
-  };
-
-  // Desconecta áudio caso troque de aba ou desmonte
-  useEffect(() => {
-    if (activeTab !== 'companion') {
-      stopAudioDetection();
-    }
-  }, [activeTab]);
-
-  useEffect(() => {
-    return () => {
-      if (rafIdRef.current) {
-        cancelAnimationFrame(rafIdRef.current);
-      }
-    };
-  }, []);
+  // --- DICIONÁRIO DE ACORDES ---
 
 
 
@@ -1181,7 +1026,7 @@ export default function App() {
             </div>
             <div className="flex items-baseline gap-1.5">
               <h1 className="text-sm sm:text-base font-black tracking-widest text-accent font-display uppercase">
-                KEYCHORD
+                CHORDTRAIL
               </h1>
               <span className="text-[9px] text-zinc-600 font-mono">v0.2.1</span>
             </div>
@@ -1291,22 +1136,14 @@ export default function App() {
             {/* COLUNA DIREITA (5 cols): Painel de Dispositivos Hardware & Variações Harmônicas */}
             <div className="lg:col-span-5 space-y-6 animate-fade-in">
               
-              {/* Painel Unificado de Entrada de Hardware (MIDI & Microfone) */}
+              {/* Painel de Entrada de Hardware (MIDI) */}
               <UnifiedInputPanel
-                inputMode={inputMode}
-                setInputMode={setInputMode}
                 midiAccess={midiAccess}
                 midiInputs={midiInputs}
                 selectedMidiInputId={selectedMidiInputId}
                 setSelectedMidiInputId={setSelectedMidiInputId}
                 midiNotesPressed={midiNotesPressed}
                 detectedChords={detectedChords}
-                isAudioDetecting={isAudioDetecting}
-                startAudioDetection={startAudioDetection}
-                stopAudioDetection={stopAudioDetection}
-                detectedFrequency={detectedFrequency}
-                detectedNoteName={detectedNoteName}
-                detectedConfidence={detectedConfidence}
                 handlePlayChordSynthFromSymbol={handlePlayChordSynthFromSymbol}
               />
 
@@ -1574,89 +1411,8 @@ export default function App() {
 
               </section>
 
-              {/* COLUNA DIREITA (5 cols): Detector de Áudio e Sugestões Harmônicas */}
+              {/* COLUNA DIREITA (5 cols): Sugestões Harmônicas */}
               <section className="lg:col-span-5 space-y-6">
-                
-                {/* Detector de Áudio em Tempo Real */}
-                <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl p-5 sm:p-6 space-y-5 relative overflow-hidden group shadow-sm">
-                  <div className="absolute w-48 h-48 -bottom-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-                  
-                  <div className="flex items-center justify-between border-b border-zinc-800 pb-4 relative z-10">
-                    <div className="flex items-center gap-3">
-                      <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
-                        <Mic className="w-5 h-5" />
-                      </div>
-                      <div>
-                        <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                          Sincronizador_Audio // Microfone
-                        </h3>
-                        <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
-                          Escute o som ambiente e identifique notas de tônica
-                        </p>
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="space-y-4 relative z-10">
-                    <div className="flex flex-col sm:flex-row items-center gap-3">
-                      {isAudioDetecting ? (
-                        <button
-                          onClick={stopAudioDetection}
-                          className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-red-500 hover:bg-red-400 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px]"
-                        >
-                          <span className="w-2.5 h-2.5 rounded-full bg-zinc-950 animate-ping"></span>
-                          Desativar Microfone
-                        </button>
-                      ) : (
-                        <button
-                          onClick={startAudioDetection}
-                          className="w-full sm:flex-1 py-3 px-4 rounded-xl bg-accent hover:brightness-110 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] shadow-[0_0_12px_rgba(0,255,170,0.2)]"
-                        >
-                          <Mic className="w-4 h-4" />
-                          Ativar Microfone
-                        </button>
-                      )}
-                    </div>
-
-                    {/* Resultados da Detecção */}
-                    {isAudioDetecting ? (
-                      <div className="p-4 bg-[#0d0d0e] border border-accent/20 rounded-xl space-y-3 font-mono text-center">
-                        <div className="text-[10px] uppercase text-zinc-500 tracking-widest">
-                          Status: Escutando Som Ambiente...
-                        </div>
-                        
-                        {detectedFrequency !== -1 ? (
-                          <div className="space-y-1">
-                            <div className="text-3xl font-black text-accent tracking-wider drop-shadow-[0_0_8px_rgba(0,255,170,0.3)]">
-                              {detectedNoteName}
-                            </div>
-                            <div className="text-[10px] text-zinc-400">
-                              Frequência Fundamental: {detectedFrequency.toFixed(1)} Hz
-                            </div>
-                            <div className="flex items-center justify-center gap-1.5 pt-1">
-                              <span className="text-[9px] uppercase text-zinc-500">Confiança:</span>
-                              <span className="text-xs text-accent font-bold">{detectedConfidence}%</span>
-                            </div>
-                          </div>
-                        ) : (
-                          <div className="py-2 text-zinc-600 text-xs uppercase animate-pulse">
-                            Aguardando som ou nota clara...
-                          </div>
-                        )}
-                      </div>
-                    ) : (
-                      <div className="p-4 bg-zinc-900/60 border border-white/5 text-zinc-400 rounded-xl text-xs space-y-1 leading-relaxed">
-                        <p className="font-bold uppercase text-zinc-300 font-mono tracking-wider flex items-center gap-1.5">
-                          🎤 Detecção de Tom em Tempo Real
-                        </p>
-                        <p>
-                          Ligue seu microfone, toque seu violão físico ou coloque uma música no som alto. O app irá tentar capturar a nota principal que você tocou e sincronizar as variações na hora!
-                        </p>
-                      </div>
-                    )}
-                  </div>
-
-                </div>
 
                 {/* Explorador de Variações Harmônicas do Acorde */}
                 <div className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl p-5 sm:p-6 space-y-5 relative overflow-hidden group shadow-sm">

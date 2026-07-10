@@ -1,41 +1,25 @@
 import React from 'react';
-import { Keyboard, Mic, Cpu, Zap, Info, Play } from 'lucide-react';
+import { Keyboard, Cpu, Info } from 'lucide-react';
 
 interface UnifiedInputPanelProps {
-  inputMode: 'midi' | 'audio';
-  setInputMode: (mode: 'midi' | 'audio') => void;
   midiAccess: any;
   midiInputs: any[];
   selectedMidiInputId: string;
   setSelectedMidiInputId: (id: string) => void;
   midiNotesPressed: number[];
   detectedChords: any[];
-  isAudioDetecting: boolean;
-  startAudioDetection: () => void;
-  stopAudioDetection: () => void;
-  detectedFrequency: number;
-  detectedNoteName: string;
-  detectedConfidence: number;
   handlePlayChordSynthFromSymbol?: (symbol: string) => void;
 }
 
 const NOTES_SHARP = ['C', 'C#', 'D', 'D#', 'E', 'F', 'F#', 'G', 'G#', 'A', 'A#', 'B'];
 
 export function UnifiedInputPanel({
-  inputMode,
-  setInputMode,
   midiAccess,
   midiInputs,
   selectedMidiInputId,
   setSelectedMidiInputId,
   midiNotesPressed,
   detectedChords,
-  isAudioDetecting,
-  startAudioDetection,
-  stopAudioDetection,
-  detectedFrequency,
-  detectedNoteName,
-  detectedConfidence,
   handlePlayChordSynthFromSymbol
 }: UnifiedInputPanelProps) {
   return (
@@ -44,64 +28,32 @@ export function UnifiedInputPanel({
         style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px' }}
         className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl pl-[12px] pr-[12px] pt-[12px] pb-[12px] mt-0 space-y-5 relative overflow-hidden group shadow-sm"
       >
-      <div className="absolute w-48 h-48 -bottom-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
+        <div className="absolute w-48 h-48 -top-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
 
-      <div className="flex items-center justify-between border-b border-zinc-800 pb-4 relative z-10">
-        <div className="flex items-center gap-3">
-          <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
-            <Cpu className="w-5 h-5" />
-          </div>
-          <div style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', marginLeft: '0px', marginRight: '0px', marginTop: '0px' }}>
-            <h3 
-              style={{ marginTop: '8px', marginBottom: '8px', paddingTop: '6px', paddingBottom: '6px' }}
-              className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono"
-            >
-              Conexao_Hardware // Inputs
-            </h3>
-            <p 
-              style={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '2px', marginBottom: '8px', paddingLeft: '1px' }}
-              className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide"
-            >
-              Ative seu Teclado MIDI USB ou Microfone de Áudio
-            </p>
+        <div className="flex items-center justify-between border-b border-zinc-800 pb-4 relative z-10">
+          <div className="flex items-center gap-3">
+            <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
+              <Cpu className="w-5 h-5" />
+            </div>
+            <div style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', marginLeft: '0px', marginRight: '0px', marginTop: '0px' }}>
+              <h3 
+                style={{ marginTop: '8px', marginBottom: '8px', paddingTop: '6px', paddingBottom: '6px' }}
+                className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono"
+              >
+                Conexão Hardware // MIDI
+              </h3>
+              <p 
+                style={{ paddingTop: '4px', paddingBottom: '4px', marginTop: '2px', marginBottom: '8px', paddingLeft: '1px' }}
+                className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide"
+              >
+                Conecte seu teclado ou controlador musical via USB
+              </p>
+            </div>
           </div>
         </div>
-      </div>
 
-      {/* Selector Sub-Tabs */}
-      <div 
-        style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '0px' }}
-        className="flex bg-[#0d0d0e] pl-[4px] pr-[4px] pt-[4px] pb-[4px] rounded-lg border border-white/5 relative z-10"
-      >
-        <button
-          onClick={() => setInputMode('midi')}
-          style={{ paddingTop: '6px', paddingBottom: '6px', marginLeft: '6px', marginRight: '6px' }}
-          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer rounded-[8px] mr-[3px] ml-[3px] mt-[3px] mb-[3px] ${
-            inputMode === 'midi'
-              ? 'bg-accent text-zinc-950 shadow-sm font-black'
-              : 'text-zinc-400 hover:text-zinc-100'
-          }`}
-        >
-          <Keyboard className="w-3.5 h-3.5" />
-          MIDI USB
-        </button>
-        <button
-          onClick={() => setInputMode('audio')}
-          style={{ paddingTop: '6px', paddingBottom: '6px', paddingRight: '0px', marginLeft: '6px', marginRight: '6px' }}
-          className={`flex-1 py-1.5 rounded-md text-[10px] sm:text-xs font-bold uppercase tracking-wider flex items-center justify-center gap-2 transition-all cursor-pointer rounded-[8px] mr-[3px] ml-[3px] mt-[3px] mb-[3px] ${
-            inputMode === 'audio'
-              ? 'bg-accent text-zinc-950 shadow-sm font-black'
-              : 'text-zinc-400 hover:text-zinc-100'
-          }`}
-        >
-          <Mic className="w-3.5 h-3.5" />
-          Microfone
-        </button>
-      </div>
-
-      {/* Render Panel Content */}
-      <div className="relative z-10">
-        {inputMode === 'midi' ? (
+        {/* Render Panel Content (MIDI ONLY) */}
+        <div className="relative z-10">
           <div className="space-y-4 animate-fade-in">
             {typeof navigator !== 'undefined' && !('requestMIDIAccess' in navigator) ? (
               <div className="p-4 bg-amber-500/10 border border-amber-500/20 text-amber-400 rounded-xl text-xs space-y-1.5">
@@ -109,16 +61,16 @@ export function UnifiedInputPanel({
                   ⚠️ API MIDI Incompatível
                 </p>
                 <p className="leading-relaxed text-zinc-400">
-                  Seu navegador não suporta a API de MIDI Web. Use o <strong>Google Chrome</strong> ou <strong>Edge</strong>.
+                  Seu navegador não suporta a API de MIDI Web. Use o <strong>Google Chrome</strong> ou <strong>Edge</strong> para conectar seu teclado físico.
                 </p>
               </div>
             ) : midiInputs.length === 0 ? (
               <div className="p-4 bg-[#0d0d0e] border border-white/5 text-zinc-400 rounded-xl text-xs space-y-1.5">
                 <p className="font-bold uppercase font-mono tracking-wider text-zinc-300 flex items-center gap-2">
-                  🔌 Nenhum teclado MIDI USB detectado
+                  🔌 Nenhum teclado MIDI detectado
                 </p>
                 <p className="leading-relaxed text-zinc-500">
-                  Conecte seu teclado musical no computador via USB e ligue-o. Ele será reconhecido na hora!
+                  Conecte seu teclado controlador no computador usando um cabo USB/MIDI e certifique-se de que esteja ligado para acender as teclas virtuais!
                 </p>
               </div>
             ) : (
@@ -126,7 +78,7 @@ export function UnifiedInputPanel({
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                   <div className="pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
                     <label className="block text-[10px] uppercase font-bold text-zinc-500 mb-2 tracking-wider font-mono">
-                      Hardware_MIDI_Ativo
+                      Hardware MIDI Ativo
                     </label>
                     <select
                       value={selectedMidiInputId}
@@ -143,7 +95,7 @@ export function UnifiedInputPanel({
 
                   <div>
                     <label className="block text-[10px] uppercase font-bold text-zinc-500 mb-2 tracking-wider font-mono">
-                      Notas_Pressionadas
+                      Notas Pressionadas
                     </label>
                     <div className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl px-3 py-2.5 text-xs text-accent font-mono min-h-[42px] flex items-center gap-1.5 flex-wrap">
                       {midiNotesPressed.length === 0 ? (
@@ -172,7 +124,7 @@ export function UnifiedInputPanel({
 
                   {midiNotesPressed.length === 0 ? (
                     <div className="py-6 text-center text-zinc-600 font-mono text-xs border border-dashed border-zinc-800 rounded-xl">
-                      Aguardando Notas Físicas no Teclado USB
+                      Toque acordes físicos no controlador para identificá-los em tempo real
                     </div>
                   ) : detectedChords.length === 0 ? (
                     <div className="py-6 text-center text-amber-500/70 bg-amber-500/5 border border-amber-500/10 rounded-xl flex items-center justify-center gap-2 text-xs">
@@ -217,68 +169,8 @@ export function UnifiedInputPanel({
               </div>
             )}
           </div>
-        ) : (
-          <div className="space-y-4 animate-fade-in">
-            <div className="flex flex-col sm:flex-row items-center gap-3">
-              {isAudioDetecting ? (
-                <button
-                  onClick={stopAudioDetection}
-                  className="w-full py-3 px-4 rounded-xl bg-red-500 hover:bg-red-400 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px]"
-                >
-                  <span className="w-2.5 h-2.5 rounded-full bg-zinc-950 animate-ping"></span>
-                  Desativar Microfone
-                </button>
-              ) : (
-                <button
-                  onClick={startAudioDetection}
-                  className="w-full py-3 px-4 rounded-xl bg-accent hover:brightness-110 text-zinc-950 font-black text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] shadow-[0_0_12px_rgba(0,255,170,0.2)]"
-                >
-                  <Mic className="w-4 h-4" />
-                  Ativar Microfone
-                </button>
-              )}
-            </div>
-
-            {/* Microphone results */}
-            {isAudioDetecting ? (
-              <div className="p-4 bg-[#0d0d0e] border border-accent/20 rounded-xl space-y-3 font-mono text-center">
-                <div className="text-[10px] uppercase text-zinc-500 tracking-widest">
-                  Status: Escutando Notas Acústicas...
-                </div>
-
-                {detectedFrequency !== -1 ? (
-                  <div className="space-y-1">
-                    <div className="text-3xl font-black text-accent tracking-wider drop-shadow-[0_0_8px_rgba(0,255,170,0.3)]">
-                      {detectedNoteName}
-                    </div>
-                    <div className="text-[10px] text-zinc-400">
-                      Frequência Fundamental: {detectedFrequency.toFixed(1)} Hz
-                    </div>
-                    <div className="flex items-center justify-center gap-1.5 pt-1">
-                      <span className="text-[9px] uppercase text-zinc-500">Confiança:</span>
-                      <span className="text-xs text-accent font-bold">{detectedConfidence}%</span>
-                    </div>
-                  </div>
-                ) : (
-                  <div className="py-2 text-zinc-600 text-xs uppercase animate-pulse">
-                    Aguardando som ou nota...
-                  </div>
-                )}
-              </div>
-            ) : (
-              <div className="p-4 bg-zinc-900/60 border border-white/5 text-zinc-400 rounded-xl text-xs space-y-1.5 leading-relaxed">
-                <p className="font-bold uppercase text-zinc-300 font-mono tracking-wider flex items-center gap-1.5">
-                  🎤 Afinador & Mapeador Acústico
-                </p>
-                <p className="text-zinc-400 text-[11px]">
-                  Ative seu microfone e toque um instrumento acústico (como violão ou piano físico). O aplicativo captará a nota tônica em tempo real e guiará seu aprendizado!
-                </p>
-              </div>
-            )}
-          </div>
-        )}
+        </div>
       </div>
     </div>
-  </div>
   );
 }

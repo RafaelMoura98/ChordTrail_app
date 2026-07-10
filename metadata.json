@@ -1,6 +1,6 @@
 {
-  "name": "Dicionário de Acordes de Teclado",
-  "description": "Dicionário interativo de acordes para teclado com visualização dinâmica de notas e intervalos.",
+  "name": "ChordTrail",
+  "description": "Estação de trabalho harmônica e prática musical interativa baseada na web com integração MIDI.",
   "requestFramePermissions": [],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
 }
