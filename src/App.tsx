@@ -8,7 +8,7 @@ import {
 import chordsData from './data/chords.json';
 import { ChordInsightsPanel } from './components/ChordInsightsPanel';
 import { reharmonizeTimelineToJazz } from './utils/harmonyEngine';
-import { MoisesPdfUploader } from './components/MoisesPdfUploader';
+import { PdfUploader } from './components/PdfUploader';
 import { UnifiedInputPanel } from './components/UnifiedInputPanel';
 import { SyncFeedbackBanner } from './components/SyncFeedbackBanner';
 
@@ -588,7 +588,7 @@ function PianoKeyboard({
 }
 
 export default function App() {
-  // Controle de Abas: 'companion' (Moises Companion) | 'midi' (Conexão MIDI & Detecção) | 'dictionary' (Dicionário)
+  // Controle de Abas: 'companion' (Chords PDF Companion) | 'midi' (Conexão MIDI & Detecção) | 'dictionary' (Dicionário)
   const [activeTab, setActiveTab] = useState<'companion' | 'midi' | 'dictionary'>('companion');
 
   // --- MODO COMPANION / MAPEADOR DE ACORDES & DETECÇÃO ---
@@ -686,7 +686,7 @@ export default function App() {
     }
   };
 
-  // --- ARRASTE E SOLTE E LEITURA DE PDF (MOISES COORDES) ---
+  // --- ARRASTE E SOLTE E LEITURA DE PDF (PDF DE CIFRAS) ---
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
 
   const handleDrag = (e: React.DragEvent) => {
@@ -709,7 +709,7 @@ export default function App() {
       if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
         await processPdfFile(file);
       } else {
-        setPdfParseError("Erro: Apenas arquivos PDF (como o exportado pelo Moises) são suportados.");
+        setPdfParseError("Erro: Apenas arquivos PDF são suportados.");
       }
     }
   };
@@ -755,7 +755,7 @@ export default function App() {
               if (c.length === 1) {
                 return ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(c);
               }
-              // Ignorar ruídos textuais comuns do PDF do Moises
+              // Ignorar ruídos textuais comuns do PDF
               if (['PDF', 'OK', 'NP', 'X', 'Y', 'TM', 'CO', 'ST', 'CH'].includes(c.toUpperCase())) {
                 return false;
               }
@@ -766,7 +766,7 @@ export default function App() {
               setCompanionText(cleanedChords.join(' '));
               setCompanionIndex(0);
             } else {
-              throw new Error("Nenhum acorde detectado no PDF. Certifique-se de carregar um PDF de cifra válido exportado pelo Moises.");
+              throw new Error("Nenhum acorde detectado no PDF. Certifique-se de carregar um PDF de cifra válido.");
             }
           } else {
             throw new Error("Não foi possível encontrar nenhum acorde na análise de texto do PDF.");
@@ -1173,8 +1173,8 @@ export default function App() {
     >
       
       {/* Top Header */}
-      <header className="h-16 border-b-2 border-white/10 bg-[#0d0d0e] sticky top-0 z-50 flex items-center justify-center px-4 sm:px-8">
-        <div className="max-w-7xl w-full mx-auto flex items-center justify-between">
+      <header className="min-h-[4rem] sm:h-16 py-3 sm:py-0 border-b-2 border-white/10 bg-[#0d0d0e] sticky top-0 z-50 flex items-center justify-center px-4 sm:px-8">
+        <div className="max-w-7xl w-full mx-auto flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-0">
           <div className="flex items-center gap-3">
             <div className="w-8 h-8 bg-[#161617] border border-white/15 text-accent flex items-center justify-center font-mono rounded-lg">
               <Music className="w-4 h-4" />
@@ -1192,22 +1192,25 @@ export default function App() {
             
             <button
               onClick={() => setActiveTab('companion')}
-              className={`px-3.5 py-2 text-xs sm:text-[13px] font-bold uppercase tracking-wider transition-all border rounded-lg flex items-center gap-2 cursor-pointer relative group ${
+              className={`px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-[13px] font-bold uppercase tracking-wider transition-all border rounded-lg flex items-center gap-1.5 sm:gap-2 cursor-pointer relative group ${
                 activeTab === 'companion'
                   ? 'bg-accent text-zinc-950 border-accent font-extrabold shadow-[0_0_12px_rgba(0,255,170,0.25)]'
                   : 'bg-[#161617] text-[#e0e0e0] border-white/10 hover:border-white/20'
               }`}
             >
               <Layers className="w-4 h-4 shrink-0" />
-              <span>Modo Moises | MIDI</span>
+              <span>
+                <span className="hidden sm:inline">Esteira de Acordes</span>
+                <span className="sm:hidden">Esteira</span> | MIDI
+              </span>
               <div className="absolute top-full left-1/2 -translate-x-1/2 mt-2 px-3 py-1.5 bg-zinc-950 border border-white/10 rounded-lg text-[10px] text-zinc-300 whitespace-nowrap opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl font-mono normal-case tracking-normal">
-                Workspace integrado de acordes, PDF Moises e inputs de microfone/MIDI
+                Workspace integrado de acordes, PDF e inputs de microfone/MIDI
               </div>
             </button>
 
             <button
               onClick={() => setActiveTab('dictionary')}
-              className={`px-3.5 py-2 text-xs sm:text-[13px] font-bold uppercase tracking-wider transition-all border rounded-lg flex items-center gap-2 cursor-pointer relative group ${
+              className={`px-3 py-1.5 sm:px-3.5 sm:py-2 text-[11px] sm:text-[13px] font-bold uppercase tracking-wider transition-all border rounded-lg flex items-center gap-1.5 sm:gap-2 cursor-pointer relative group ${
                 activeTab === 'dictionary'
                   ? 'bg-accent text-zinc-950 border-accent font-extrabold shadow-[0_0_12px_rgba(0,255,170,0.25)]'
                   : 'bg-[#161617] text-[#e0e0e0] border-white/10 hover:border-white/20'
@@ -1225,25 +1228,24 @@ export default function App() {
         </div>
       </header>
 
-      {/* --- ABA 1: UNIFIED WORKSPACE (MOISES COMPANION + MIDI CONNECTION) --- */}
+      {/* --- ABA 1: UNIFIED WORKSPACE (PDF COMPANION + MIDI CONNECTION) --- */}
       {activeTab === 'companion' && (
         <div className="flex-1 w-full flex flex-col overflow-y-auto bg-[#0d0d0e] min-h-0">
           <main 
+            style={{ marginLeft: '-5px' }}
             className="w-full max-w-[1295px] mx-auto p-4 sm:p-6 pb-2 grid grid-cols-1 lg:grid-cols-12 gap-6 shrink-0"
           >
             <div 
-              style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px' }}
               className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full col-span-12"
             >
             
-            {/* COLUNA ESQUERDA (7 cols): Esteira de Acordes, PDF Moises, Teclados e Feedbacks */}
+            {/* COLUNA ESQUERDA (7 cols): Esteira de Acordes, PDF de Cifras, Teclados e Feedbacks */}
             <div 
-              style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px' }}
-              className="lg:col-span-7 space-y-6 animate-fade-in"
+              className="lg:col-span-7 space-y-6 animate-fade-in w-full"
             >
               
-              {/* Moises PDF Uploader & Chords Conveyor */}
-              <MoisesPdfUploader
+              {/* PDF Uploader & Chords Conveyor */}
+              <PdfUploader
                 companionText={companionText}
                 setCompanionText={setCompanionText}
                 companionIndex={companionIndex}
@@ -1268,7 +1270,7 @@ export default function App() {
                   subtitle={`Posicionamento correto das notas e intervalos de ${companionActiveChordSymbol}`}
                   badgeText="GUIA DE REFERÊNCIA"
                   useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(companionActiveChordParsed.rootNote)}
-                  style={{ paddingTop: '12px', paddingBottom: '12px', marginLeft: '12px', marginRight: '12px', marginTop: '12px', marginBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}
+                  style={{ paddingTop: '12px', paddingBottom: '12px', marginTop: '12px', marginBottom: '12px', paddingLeft: '12px', paddingRight: '12px' }}
                 />
               ) : (
                 <div className="p-8 bg-[#161617] border border-white/5 rounded-xl text-center font-mono text-zinc-500 text-xs">
@@ -1281,7 +1283,7 @@ export default function App() {
                 isChordMatched={isChordMatched}
                 midiNotesPressed={midiNotesPressed}
                 activeChordSymbol={companionActiveChordSymbol || 'Sem Acorde'}
-                style={{ marginLeft: '6px', marginRight: '6px', marginTop: '10px', marginBottom: '10px', paddingTop: '8px', paddingBottom: '8px', paddingRight: '18px', paddingLeft: '18px' }}
+                style={{ marginTop: '10px', marginBottom: '10px', paddingTop: '8px', paddingBottom: '8px', paddingRight: '18px', paddingLeft: '18px' }}
               />
 
             </div>
@@ -1322,7 +1324,7 @@ export default function App() {
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                        Variações_da_Tônica // {midiGuideRoot}
+                        Variações da Tônica // {midiGuideRoot}
                       </h3>
                       <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
                         Variações sugeridas para a nota tônica atual
@@ -1417,7 +1419,7 @@ export default function App() {
             parsedChord={null}
             variant="current"
             title="Teclado MIDI ao Vivo (61 Teclas)"
-            subtitle="Notas acendem em tempo real ao pressionar as teclas do teclado controlador USB (C2 a C7)"
+            subtitle="Notas acendem em tempo real ao pressionar as teclas do teclado controlador USB (C1 a C7)"
             badgeText={midiNotesPressed.length > 0 ? `${midiNotesPressed.length} TECLAS ATIVAS` : 'CONTROLADOR OFFLINE'}
             activeMidiNotes={midiNotesPressed}
             useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb'].includes(companionActiveChordParsed?.rootNote || 'C')}
@@ -1435,7 +1437,7 @@ export default function App() {
         <main 
           className="flex-1 w-full max-w-[1295px] mx-auto p-4 sm:p-6 grid grid-cols-1 lg:grid-cols-12 gap-6 overflow-y-auto"
         >
-          {/* COMPANION MOISES LAYOUT */}
+          {/* COMPANION LAYOUT */}
           <div className="grid grid-cols-1 lg:grid-cols-12 gap-6 items-start w-full">
             <>
               {/* COLUNA ESQUERDA (7 cols): Esteira de Acordes e Piano Visual */}
@@ -1452,7 +1454,7 @@ export default function App() {
                       </div>
                       <div>
                         <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                          Esteira_de_Acordes // Moises_Companion
+                          Esteira de Acordes
                         </h3>
                         <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
                           Digite sua sequência de cifras para projetá-las instantaneamente no teclado
@@ -1589,7 +1591,7 @@ export default function App() {
                           Sincronizador_Audio // Microfone
                         </h3>
                         <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
-                          Escute o som ambiente ou o Moises e identifique notas de tônica
+                          Escute o som ambiente e identifique notas de tônica
                         </p>
                       </div>
                     </div>
@@ -1648,7 +1650,7 @@ export default function App() {
                           🎤 Detecção de Tom em Tempo Real
                         </p>
                         <p>
-                          Ligue seu microfone, toque seu violão físico ou coloque a música do Moises no som alto. O app irá tentar capturar a nota principal que você tocou e sincronizar as variações na hora!
+                          Ligue seu microfone, toque seu violão físico ou coloque uma música no som alto. O app irá tentar capturar a nota principal que você tocou e sincronizar as variações na hora!
                         </p>
                       </div>
                     )}
@@ -1667,7 +1669,7 @@ export default function App() {
                       </div>
                       <div>
                         <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                          Variações_da_Tônica // {midiGuideRoot}
+                          Variações da Tônica // {midiGuideRoot}
                         </h3>
                         <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
                           Variações sugeridas para a nota tônica atual
@@ -1767,7 +1769,7 @@ export default function App() {
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                        Hardware_Teclado_MIDI // Entrada
+                        Hardware Teclado MIDI // Entrada
                       </h3>
                       <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
                         Conecte seu teclado controlador físico para mapear acordes
@@ -1808,14 +1810,14 @@ export default function App() {
                         🔌 Nenhum dispositivo MIDI detectado
                       </p>
                       <p className="leading-relaxed">
-                        Conecte seu teclado controlador físico no computador ou tablet usando um cabo USB e certifique-se de que ele esteja ligado. O navegador irá reconhecê-lo automaticamente!
+                        Conecte seu teclado controlador físico no computador ou tablet usando um cabo MIDI/USB e certifique-se de que ele esteja ligado. O navegador irá reconhecê-lo automaticamente!
                       </p>
                     </div>
                   ) : (
                     <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
                       <div>
                         <label className="block text-[10px] uppercase font-bold text-zinc-500 mb-2 tracking-wider font-mono">
-                          Dispositivo_MIDI_Ativo
+                          Dispositivo MIDI Ativo
                         </label>
                         <select
                           value={selectedMidiInputId}
@@ -1832,7 +1834,7 @@ export default function App() {
 
                       <div>
                         <label className="block text-[10px] uppercase font-bold text-zinc-500 mb-2 tracking-wider font-mono">
-                          Notas_Pressionadas_Fisicas
+                          Notas Pressionadas Fisicas
                         </label>
                         <div className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl px-4 py-2.5 text-xs sm:text-sm text-accent font-mono min-h-[44px] flex items-center gap-1.5 flex-wrap">
                           {midiNotesPressed.length === 0 ? (
@@ -1880,7 +1882,7 @@ export default function App() {
                     </div>
                     <div>
                       <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono">
-                        Detecção_Harmonica_Física // Smart_Detector
+                        Detecção Harmonica Física // Smart_Detector
                       </h3>
                       <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide">
                         Reconhecimento de acordes formados em tempo real pelas notas pressionadas
@@ -2137,11 +2139,10 @@ export default function App() {
       {/* --- ABA 3: DICIONÁRIO COMPLETO DE ACORDES E FILTROS --- */}
       {activeTab === 'dictionary' && (
         <main 
-          style={{ marginLeft: '30px', paddingLeft: '0px' }}
+          style={{ marginLeft: '-5px' }}
           className="flex-1 w-full max-w-[1295px] mx-auto p-4 sm:p-6 lg:p-8 overflow-y-auto flex flex-col items-center justify-center"
         >
           <div 
-            style={{ marginLeft: '25px' }}
             className="w-full space-y-6 my-auto"
           >
             
@@ -2238,7 +2239,7 @@ export default function App() {
                   className="text-[11px] uppercase tracking-wider font-bold text-zinc-500 block font-mono text-center sm:text-left"
                   style={{ fontStyle: 'italic', color: '#00A769', paddingLeft: '12px', paddingRight: '12px', paddingTop: '10px', paddingBottom: '10px' }}
                 >
-                  2. Modo (Maior / Menor):
+                  2. Modo (M / m):
                 </span>
                 <div 
                   className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono"
@@ -2331,7 +2332,7 @@ export default function App() {
                 className="flex flex-wrap justify-center sm:justify-start gap-2 text-xs sm:text-sm font-mono"
                 style={{ paddingTop: '10px', paddingBottom: '10px', paddingLeft: '12px', paddingRight: '12px' }}
               >
-                {['Fundamental (0ª)', '1ª Inversão', '2ª Inversão', '3ª Inversão'].map((label, idx) => (
+                {['Fundamental', '1ª Inversão', '2ª Inversão', '3ª Inversão'].map((label, idx) => (
                   <button
                     key={idx}
                     onClick={() => setInversion(idx)}

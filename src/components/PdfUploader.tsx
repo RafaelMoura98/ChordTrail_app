@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { Music, Volume2, FileUp, Layers, FileText, Check, Loader2, HelpCircle } from 'lucide-react';
 
-interface MoisesPdfUploaderProps {
+interface PdfUploaderProps {
   companionText: string;
   setCompanionText: (text: string) => void;
   companionIndex: number;
@@ -17,7 +17,7 @@ interface MoisesPdfUploaderProps {
   style?: React.CSSProperties;
 }
 
-export function MoisesPdfUploader({
+export function PdfUploader({
   companionText,
   setCompanionText,
   companionIndex,
@@ -31,7 +31,7 @@ export function MoisesPdfUploader({
   playChordSynth,
   companionActiveChordParsed,
   style
-}: MoisesPdfUploaderProps) {
+}: PdfUploaderProps) {
   const [isDragActive, setIsDragActive] = useState<boolean>(false);
   const [isParsingPdf, setIsParsingPdf] = useState<boolean>(false);
   const [pdfParseError, setPdfParseError] = useState<string | null>(null);
@@ -57,7 +57,7 @@ export function MoisesPdfUploader({
       if (file.type === "application/pdf" || file.name.endsWith(".pdf")) {
         await processPdfFile(file);
       } else {
-        setPdfParseError("Apenas arquivos PDF (como os do Moises App) são aceitos.");
+        setPdfParseError("Apenas arquivos PDF são aceitos.");
         setPdfSuccess(false);
       }
     }
@@ -111,7 +111,7 @@ export function MoisesPdfUploader({
               if (c.length === 1) {
                 return ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(c);
               }
-              // Ignorar ruídos textuais comuns do PDF do Moises
+              // Ignorar ruídos textuais comuns do PDF de cifras
               if (['PDF', 'OK', 'NP', 'X', 'Y', 'TM', 'CO', 'ST', 'CH'].includes(c.toUpperCase())) {
                 return false;
               }
@@ -127,7 +127,7 @@ export function MoisesPdfUploader({
               throw new Error("Nenhum acorde válido detectado no PDF.");
             }
           } else {
-            throw new Error("Não foi possível encontrar nenhum acorde no PDF do Moises.");
+            throw new Error("Não foi possível encontrar nenhum acorde no PDF de cifras.");
           }
         } catch (err: any) {
           console.error("Erro interno no PDF.js:", err);
@@ -159,7 +159,7 @@ export function MoisesPdfUploader({
           <div>
             <div className="flex items-center gap-2">
               <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono ml-[2px] mt-0 font-sans">
-                Esteira_de_Acordes // Moises_Companion
+                Esteira de Acordes // PDF Companion
               </h3>
               {/* Tooltip de ajuda */}
               <div className="group relative">
@@ -167,12 +167,12 @@ export function MoisesPdfUploader({
                   <HelpCircle className="w-4 h-4" />
                 </button>
                 <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 border border-white/10 rounded-lg text-xs text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl leading-relaxed">
-                  Suba o PDF exportado do Moises ou digite os acordes na caixa de texto. O visualizador de acordes criará uma sequência de botões para você treinar com facilidade!
+                  Suba o arquivo PDF de cifra exportado ou digite os acordes na caixa de texto. O visualizador de acordes criará uma sequência de botões para você treinar com facilidade!
                 </div>
               </div>
             </div>
             <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide ml-[2px] mt-0">
-              Suba o PDF do Moises ou digite cifras para projetá-las na esteira de estudos
+              Suba o PDF ou digite cifras para projetá-las na esteira de estudos
             </p>
           </div>
         </div>
@@ -195,7 +195,7 @@ export function MoisesPdfUploader({
           {isParsingPdf ? (
             <div className="flex flex-col items-center gap-2 text-accent">
               <Loader2 className="w-8 h-8 animate-spin" />
-              <p className="text-xs font-mono uppercase font-bold tracking-wider">Analisando PDF do Moises...</p>
+              <p className="text-xs font-mono uppercase font-bold tracking-wider">Analisando PDF de Cifras...</p>
             </div>
           ) : pdfSuccess ? (
             <div className="flex flex-col items-center gap-1.5 text-accent animate-bounce">
@@ -209,7 +209,7 @@ export function MoisesPdfUploader({
               </div>
               <div>
                 <p className="text-xs font-bold text-zinc-300">
-                  Arraste o PDF do Moises aqui ou{" "}
+                  Arraste o PDF de cifra aqui ou{" "}
                   <label className="text-accent hover:underline cursor-grab" style={{ cursor: 'grab' }}>
                     escolha um arquivo
                     <input
@@ -221,7 +221,7 @@ export function MoisesPdfUploader({
                   </label>
                 </p>
                 <p className="text-[10px] text-zinc-500 font-mono mt-1 uppercase tracking-wide">
-                  Formato PDF exportado diretamente do Moises App
+                  Formato PDF contendo cifras musicais estruturadas
                 </p>
               </div>
             </div>
@@ -331,13 +331,12 @@ export function MoisesPdfUploader({
         {/* Tactical Controls & Page Turner Info */}
         <div 
           style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '6px', marginRight: '6px', marginTop: '8px', marginBottom: '8px' }}
-          className="flex items-center justify-between gap-4 pt-2 pl-[2px] pr-[2px] pt-[2px] pb-[2px]"
+          className="flex items-center justify-between gap-4 pt-2 pl-[2px] pr-[2px] pt-[2px] pb-[2px] w-full"
         >
           <button
             onClick={() => setCompanionIndex((prev) => (prev - 1 + companionDisplayedChords.length) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            style={{ width: '284px' }}
-            className="flex-1 rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="flex-1 max-w-[284px] rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
           >
             ◀ Anterior
           </button>
@@ -345,8 +344,7 @@ export function MoisesPdfUploader({
           <button
             onClick={() => playChordSynth(companionActiveChordParsed?.notes || [])}
             disabled={!companionActiveChordParsed}
-            style={{ width: '44px' }}
-            className="rounded-[8px] bg-[#0d0d0e] border border-white/10 hover:border-accent/40 text-accent transition-all flex items-center justify-center min-h-[44px] disabled:opacity-40 cursor-pointer pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="shrink-0 w-11 rounded-[8px] bg-[#0d0d0e] border border-white/10 hover:border-accent/40 text-accent transition-all flex items-center justify-center min-h-[44px] disabled:opacity-40 cursor-pointer pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
             title="Ouvir som do acorde de referência"
           >
             <Volume2 className="w-5 h-5" />
@@ -355,8 +353,7 @@ export function MoisesPdfUploader({
           <button
             onClick={() => setCompanionIndex((prev) => (prev + 1) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            style={{ width: '284px' }}
-            className="flex-1 rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="flex-1 max-w-[284px] rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
           >
             Próximo ▶
           </button>
