@@ -1,16 +1,27 @@
-@import url('https://fonts.googleapis.com/css2?family=Syne:wght@800&family=JetBrains+Mono:wght@400;500;700&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: 'JetBrains Mono', monospace;
-  --font-mono: 'JetBrains Mono', monospace;
-  --font-display: 'Syne', sans-serif;
-  --color-accent: #00ffaa;
+  --font-sans: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+  --font-display: 'Outfit', sans-serif;
+  --font-mono: 'Geist Mono', monospace;
+  
+  --color-bg-base: #0A090E;
+  --color-bg-surface: #12111A;
+  --color-bg-elevated: #16141D;
+  --color-accent: #0FE49B;
+  --color-accent-primary: #0FE49B;
+  --color-accent-secondary: #059669;
+  --color-accent-violet: #A78BFA;
+  --color-text-primary: #F4F4F7;
+  --color-text-secondary: #A1A0AE;
+  --color-text-muted: #6D6B7D;
+  --color-text-heading: #F8FAFC;
+  --color-error: #EF4444;
 }
 
 body {
-  background-color: #0d0d0e;
-  color: #e0e0e0;
+  background-color: #0A090E;
+  color: #F4F4F7;
   font-family: var(--font-sans);
   overflow-x: hidden;
   min-height: 100vh;
@@ -18,35 +29,21 @@ body {
 
 /* Custom Smooth Scrollbar */
 ::-webkit-scrollbar {
-  width: 6px;
-  height: 6px;
+  width: 5px;
+  height: 5px;
 }
 
 ::-webkit-scrollbar-track {
-  background: rgba(13, 13, 14, 0.9);
+  background: rgba(10, 9, 14, 0.9);
 }
 
 ::-webkit-scrollbar-thumb {
-  background: rgba(0, 255, 170, 0.3);
+  background: rgba(15, 228, 155, 0.25);
   border-radius: 9999px;
 }
 
 ::-webkit-scrollbar-thumb:hover {
-  background: rgba(0, 255, 170, 0.6);
-}
-
-/* Glassmorphism utilities */
-.glass-panel {
-  background: rgba(24, 24, 27, 0.4);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
-  border: 1px solid rgba(39, 39, 42, 0.8);
-}
-
-.glass-panel-accent {
-  background: linear-gradient(135deg, rgba(34, 211, 238, 0.08) 0%, rgba(24, 24, 27, 0.6) 100%);
-  backdrop-filter: blur(16px);
-  border: 1px solid rgba(34, 211, 238, 0.4);
+  background: rgba(15, 228, 155, 0.5);
 }
 
 /* Hide scrollbar utility */
@@ -57,5 +54,6 @@ body {
   -ms-overflow-style: none;
   scrollbar-width: none;
 }
+
 
 

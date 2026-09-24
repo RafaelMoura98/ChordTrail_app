@@ -3,21 +3,24 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>KeyChord</title>
-  <!-- Google Fonts -->
+  <title>ChordTrail</title>
+  <meta name="description" content="Estação de trabalho harmônica e prática musical interativa baseada na web com integração MIDI." />
+  <!-- Google Fonts: Outfit, Geist, Geist Mono -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;600;700;800&family=Montserrat:ital,wght@0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,400;1,600&family=Plus+Jakarta+Sans:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Geist+Mono:wght@400;500;600;700&family=Geist:wght@400;500;600;700&family=Outfit:wght@400;500;600;700;800&display=swap" rel="stylesheet">
   
   <style>
-    /* ESTILOS CSS - TEMA NOTURNO MODERNO COM DESTAQUE NEON #00E8F7 */
     :root {
-      --cyan-neon: #00E8F7;
-      --cyan-glow: rgba(0, 232, 247, 0.4);
-      --bg-dark: #030712;
-      --panel-dark: #0a101f;
-      --text-main: #f3f4f6;
-      --border-cyan: rgba(0, 232, 247, 0.25);
+      --bg-base: #0A090E;
+      --bg-surface: #0F172A;
+      --bg-elevated: #16141D;
+      --accent-primary: #0FE49B;
+      --accent-secondary: #059669;
+      --text-primary: #F4F4F7;
+      --text-secondary: #A1A0AE;
+      --text-muted: #6D6B7D;
+      --text-heading: #F8FAFC;
     }
 
     * {
@@ -27,65 +30,13 @@
     }
 
     body {
-      background: radial-gradient(ellipse 120% 120% at 50% -10%, #0d1b32 0%, #060d1d 45%, #02050d 100%);
-      background-attachment: fixed;
-      color: var(--text-main);
-      font-family: 'Inter', system-ui, sans-serif;
+      background-color: #0A090E;
+      color: #F4F4F7;
+      font-family: 'Geist', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-    }
-
-    header {
-      height: 64px;
-      border-bottom: 1px solid var(--border-cyan);
-      background: rgba(6, 10, 23, 0.85);
-      backdrop-filter: blur(16px);
-      display: flex;
-      align-items: center;
-      justify-content: space-between;
-      padding: 0 24px;
-      position: sticky;
-      top: 0;
-      z-index: 50;
-    }
-
-    .logo {
-      display: flex;
-      align-items: center;
-      gap: 12px;
-      font-family: 'Space Grotesk', sans-serif;
-      font-size: 1.25rem;
-      font-weight: 800;
-      color: #fff;
-    }
-
-    .logo-icon {
-      width: 36px;
-      height: 36px;
-      background: var(--cyan-neon);
-      border-radius: 10px;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      color: #030712;
-      box-shadow: 0 0 20px var(--cyan-glow);
-    }
-
-    .accent-text {
-      color: var(--cyan-neon);
-    }
-
-    .badge {
-      font-family: 'JetBrains Mono', monospace;
-      font-size: 0.65rem;
-      padding: 3px 10px;
-      border-radius: 999px;
-      border: 1px solid var(--border-cyan);
-      background: rgba(0, 232, 247, 0.1);
-      color: var(--cyan-neon);
-      text-transform: uppercase;
-      letter-spacing: 1px;
+      overflow-x: hidden;
     }
 
     #root {
@@ -100,7 +51,7 @@
   <div id="root"></div>
 
   <!-- Script Principal do React/Vite -->
-  <!-- PDF.js library to parse Moises PDF client-side -->
+  <!-- PDF.js library to parse Moises / chord PDFs client-side -->
   <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.min.js"></script>
   <script type="module" src="/src/main.tsx"></script>
 </body>

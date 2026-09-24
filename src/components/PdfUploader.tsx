@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Music, Volume2, FileUp, Layers, FileText, Check, Loader2, HelpCircle } from 'lucide-react';
+import { Music, Volume2, FileText, Check, Loader2, ArrowRight, ArrowLeft, AudioWaveform, FileUp, Sparkles, Play } from 'lucide-react';
 
 interface PdfUploaderProps {
   companionText: string;
@@ -86,7 +86,7 @@ export function PdfUploader({
 
           const pdfjsLib = (window as any).pdfjsLib;
           if (!pdfjsLib) {
-            throw new Error("Aguarde o carregamento do leitor de PDF do navegador. Se persistir, recarregue a página.");
+            throw new Error("Aguarde o carregamento do leitor de PDF do navegador.");
           }
 
           pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.4.120/pdf.worker.min.js';
@@ -102,7 +102,6 @@ export function PdfUploader({
             fullText += pageText + '\n';
           }
 
-          // Regex para detectar padrões de acorde (C, G9, Am, F#m7(b5), Bb/D, etc.)
           const chordRegex = /\b[A-G][b#]?(?:maj|min|aug|dim|sus|add|m|M)?\d*(?:\([^)]*\))?(?:\/[A-G][b#]?)?\b/g;
           const foundChords = fullText.match(chordRegex);
 
@@ -111,7 +110,6 @@ export function PdfUploader({
               if (c.length === 1) {
                 return ['A', 'B', 'C', 'D', 'E', 'F', 'G'].includes(c);
               }
-              // Ignorar ruídos textuais comuns do PDF de cifras
               if (['PDF', 'OK', 'NP', 'X', 'Y', 'TM', 'CO', 'ST', 'CH'].includes(c.toUpperCase())) {
                 return false;
               }
@@ -145,227 +143,220 @@ export function PdfUploader({
   };
 
   return (
-    <div style={style} className="bg-[#161617] border-2 border-white/10 hover:border-accent/40 transition-colors rounded-xl pl-[12px] pr-[12px] pt-[12px] pb-[12px] mt-0 space-y-5 relative overflow-hidden group shadow-sm">
-      <div className="absolute w-48 h-48 -top-12 -right-12 bg-accent/5 rounded-full blur-3xl pointer-events-none"></div>
-
-      <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 border-b border-zinc-800 pb-4 relative z-10 pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
-        <div 
-          style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '4px', marginRight: '4px', marginTop: '6px', marginBottom: '6px' }}
-          className="flex items-center gap-3 pl-[2px] pr-[2px] pt-[2px] pb-[2px] ml-0 mt-0"
-        >
-          <div className="p-2 bg-[#0d0d0e] text-accent border border-accent/20 rounded-xl">
-            <Music className="w-5 h-5" />
-          </div>
-          <div>
-            <div className="flex items-center gap-2">
-              <h3 className="text-sm sm:text-base font-bold text-zinc-100 uppercase tracking-wider font-mono ml-[2px] mt-0 font-sans">
-                Esteira de Acordes // PDF Companion
-              </h3>
-              {/* Tooltip de ajuda */}
-              <div className="group relative">
-                <button className="text-zinc-500 hover:text-zinc-300 transition-colors cursor-help">
-                  <HelpCircle className="w-4 h-4" />
-                </button>
-                <div className="absolute bottom-full left-1/2 -translate-x-1/2 mb-2 w-64 p-3 bg-zinc-950 border border-white/10 rounded-lg text-xs text-zinc-300 opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none z-50 shadow-xl leading-relaxed">
-                  Suba o arquivo PDF de cifra exportado ou digite os acordes na caixa de texto. O visualizador de acordes criará uma sequência de botões para você treinar com facilidade!
-                </div>
-              </div>
-            </div>
-            <p className="text-[10px] sm:text-xs text-zinc-500 font-mono uppercase tracking-wide ml-[2px] mt-0">
-              Suba o PDF ou digite cifras para projetá-las na esteira de estudos
-            </p>
-          </div>
+    <div className="space-y-[24px] w-full">
+      {/* 🔹 Card 2 — PDF Companion (40, 506 | 810 × 238) */}
+      <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-[24px] space-y-[16px] relative overflow-hidden group shadow-lg">
+        {/* Título & Subtítulo */}
+        <div>
+          <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+            PDF Companion
+          </h3>
+          <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-[17px] mt-[4px]">
+            Projete cifras estruturadas diretamente no seu fluxo de estudo
+          </p>
         </div>
-      </div>
 
-      <div className="space-y-4 relative z-10">
-        {/* PDF Drag and Drop Area */}
+        {/* upload-zone (762 × 130 | fill: #0FE49B @8%, stroke: #0FE49B, r:12, pad:28) */}
         <div
           onDragEnter={handleDrag}
           onDragOver={handleDrag}
           onDragLeave={handleDrag}
           onDrop={handleDrop}
-          style={{ marginLeft: '8px', marginRight: '8px', marginTop: '8px', marginBottom: '8px', paddingLeft: '6px', paddingRight: '6px', paddingTop: '6px', paddingBottom: '6px' }}
-          className={`border-2 border-dashed rounded-xl pl-[20px] pr-[20px] pt-[15px] pb-[15px] cursor-pointer transition-all duration-300 text-center relative flex flex-col items-center justify-center min-h-[110px] ${
+          className={`w-full min-h-[130px] rounded-[12px] p-[28px] border transition-all flex flex-col items-center justify-center text-center cursor-pointer relative ${
             isDragActive
-              ? "border-accent bg-accent/5 shadow-[0_0_15px_rgba(0,255,170,0.15)]"
-              : "border-white/10 bg-[#0d0d0e] hover:border-white/20"
+              ? "bg-[#0FE49B]/[0.14] border-[#0FE49B] shadow-[0_0_16px_rgba(15,228,155,0.25)]"
+              : "bg-[#0FE49B]/[0.08] border-[#0FE49B] hover:bg-[#0FE49B]/[0.12]"
           }`}
         >
+          <input
+            type="file"
+            id="pdf-companion-file-input"
+            accept=".pdf"
+            onChange={handleFileSelect}
+            className="hidden"
+          />
+
           {isParsingPdf ? (
-            <div className="flex flex-col items-center gap-2 text-accent">
-              <Loader2 className="w-8 h-8 animate-spin" />
-              <p className="text-xs font-mono uppercase font-bold tracking-wider">Analisando PDF de Cifras...</p>
+            <div className="flex flex-col items-center justify-center gap-[8px] text-[#0FE49B]">
+              <Loader2 className="w-[24px] h-[24px] animate-spin" />
+              <p className="font-sans font-semibold text-[14px] text-[#F4F4F7]">
+                Analisando PDF de Cifras...
+              </p>
+              <p className="font-sans font-normal text-[12px] text-[#A1A0AE]">
+                Extraindo acordes e sequências harmônicas
+              </p>
             </div>
           ) : pdfSuccess ? (
-            <div className="flex flex-col items-center gap-1.5 text-accent animate-bounce">
-              <Check className="w-8 h-8" />
-              <p className="text-xs font-mono uppercase font-bold tracking-wider">Cifras importadas com sucesso!</p>
+            <div className="flex flex-col items-center justify-center gap-[6px] text-[#0FE49B]">
+              <Check className="w-[24px] h-[24px] stroke-[2.5]" />
+              <p className="font-sans font-semibold text-[14px] text-[#0FE49B]">
+                Cifras importadas com sucesso!
+              </p>
+              <p className="font-sans font-normal text-[12px] text-[#A1A0AE]">
+                Acordes carregados na esteira de estudo
+              </p>
             </div>
           ) : (
-            <div className="space-y-2">
-              <div className="w-10 h-10 rounded-full bg-zinc-900 border border-white/5 flex items-center justify-center text-zinc-400 mx-auto group-hover:text-accent transition-colors">
-                <FileUp className="w-5 h-5" />
+            <label
+              htmlFor="pdf-companion-file-input"
+              className="w-full flex flex-col items-center justify-center gap-[6px] cursor-pointer"
+            >
+              {/* Ícone file-music (dentro): 24 × 24 centralizado */}
+              <div className="w-[24px] h-[24px] text-[#0FE49B] flex items-center justify-center">
+                <Music className="w-[24px] h-[24px] stroke-[2]" />
               </div>
-              <div>
-                <p className="text-xs font-bold text-zinc-300">
-                  Arraste o PDF de cifra aqui ou{" "}
-                  <label className="text-accent hover:underline cursor-grab" style={{ cursor: 'grab' }}>
-                    escolha um arquivo
-                    <input
-                      type="file"
-                      accept=".pdf"
-                      onChange={handleFileSelect}
-                      className="hidden"
-                    />
-                  </label>
-                </p>
-                <p className="text-[10px] text-zinc-500 font-mono mt-1 uppercase tracking-wide">
-                  Formato PDF contendo cifras musicais estruturadas
-                </p>
-              </div>
-            </div>
+
+              {/* Texto upload principal: Geist SemiBold 14px */}
+              <p className="font-sans font-semibold text-[14px] text-[#F4F4F7] leading-tight">
+                Arraste o PDF de cifra aqui ou{" "}
+                <span className="text-[#0FE49B] underline hover:text-[#38F9B6] transition-colors">
+                  escolha um arquivo
+                </span>
+              </p>
+
+              {/* Texto upload secundário: Geist Regular 12px, #A1A0AE */}
+              <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-tight">
+                Formato PDF contendo cifras musicais estruturadas
+              </p>
+            </label>
           )}
 
           {pdfParseError && (
-            <div className="absolute inset-x-2 bottom-2 bg-red-500/10 border border-red-500/25 rounded-lg px-3 py-1.5 text-[10px] text-red-400 font-mono">
-              ⚠️ {pdfParseError}
+            <div className="mt-[8px] text-[11px] text-[#FCA5A5] font-mono bg-[#EF4444]/10 border border-[#EF4444]/30 rounded-[6px] px-3 py-1">
+              {pdfParseError}
             </div>
           )}
         </div>
 
-        {/* Collapsible Text Area Switch */}
-        <div 
-          style={{ marginLeft: '4px', marginRight: '4px', marginTop: '8px', marginBottom: '8px', paddingTop: '8px', paddingBottom: '8px' }}
-          className="flex items-center justify-between pl-[4px] pr-[4px] pt-[2px] pb-[2px]"
-        >
+        {/* Toggle para editor manual de cifras */}
+        <div className="flex items-center justify-between text-[12px] text-[#A1A0AE] pt-[2px]">
           <button
             onClick={() => setShowChordInputText(!showChordInputText)}
-            style={{ paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px', marginLeft: '6px', marginRight: '6px', marginTop: '3px', marginBottom: '3px' }}
-            className="flex items-center gap-2 px-3 py-1.5 rounded-lg bg-[#0d0d0e] border border-white/5 hover:border-white/10 text-zinc-400 hover:text-zinc-200 text-xs transition-colors cursor-pointer rounded-[8px] font-medium mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="hover:text-[#F4F4F7] transition-colors flex items-center gap-1.5 cursor-pointer"
           >
-            <FileText className="w-4 h-4 text-accent/80" />
-            <span>{showChordInputText ? "Ocultar Editor de Cifras" : "Editar / Digitar Cifras"}</span>
+            <FileText className="w-3.5 h-3.5 text-[#0FE49B]" />
+            <span>{showChordInputText ? "Ocultar editor de texto" : "Digitar cifras manualmente"}</span>
           </button>
-
-          {/* Unique Chords / Compact Mode Toggle */}
-          <div 
-            style={{ paddingLeft: '8px', paddingRight: '8px', paddingTop: '4px', paddingBottom: '4px', marginLeft: '6px', marginRight: '6px', marginTop: '3px', marginBottom: '3px' }}
-            className="flex items-center gap-2"
-          >
-            <span className="text-[10px] font-mono text-zinc-500 uppercase tracking-wide">
-              Modo Compacto (Únicos)
-            </span>
-            <button
-              onClick={() => setCompanionUniqueOnly(!companionUniqueOnly)}
-              className={`p-1.5 rounded-lg border transition-all cursor-pointer rounded-[8px] mr-[2px] ml-[2px] mt-[2px] mb-[2px] ${
-                companionUniqueOnly
-                  ? "bg-accent/15 border-accent text-accent shadow-[0_0_8px_rgba(0,255,170,0.1)]"
-                  : "bg-[#0d0d0e] border-white/5 text-zinc-500 hover:text-zinc-300"
-              }`}
-              title="Exibir cada acorde apenas uma vez na esteira (ideal para estudar formatos de acordes da música)"
-            >
-              <Layers className="w-4 h-4" />
-            </button>
-          </div>
         </div>
 
-        {/* Text Area for manual chords editing */}
         {showChordInputText && (
-          <div className="space-y-1.5 animate-fade-in pl-[2px] pr-[2px] pt-[2px] pb-[2px]">
-            <label className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono">
-              Sequência de Cifras de Texto
-            </label>
+          <div className="pt-1 space-y-1.5 animate-fadeIn">
             <textarea
               value={companionText}
               onChange={(e) => setCompanionText(e.target.value)}
               rows={2}
-              placeholder="Digite ou cole acordes separados por espaço (ex: C D G Em7)..."
-              className="w-full bg-[#0d0d0e] border border-white/10 rounded-xl pl-[10px] pr-[10px] pt-[10px] pb-[10px] text-xs sm:text-sm text-accent font-mono focus:outline-none focus:border-accent transition-all resize-none placeholder:text-zinc-700 min-h-[64px]"
+              placeholder="Digite os acordes separados por espaço (ex: C9 D G Em7 C G Am F)..."
+              className="w-full bg-[#0A090E] border border-white/10 rounded-[8px] p-3 text-[13px] text-[#0FE49B] font-mono focus:outline-none focus:border-[#0FE49B] transition-all resize-none placeholder-[#6D6B7D]"
             />
           </div>
         )}
+      </div>
 
-        {/* Horizontal Chords Slider */}
-        <div className="space-y-2">
-          <span 
-            style={{ marginLeft: '6px', marginRight: '6px', marginTop: '6px', marginBottom: '6px', paddingLeft: '6px', paddingRight: '6px', paddingTop: '3px', paddingBottom: '3px' }}
-            className="block text-[10px] uppercase font-bold text-zinc-500 tracking-wider font-mono"
-          >
-            Estação de Prática (Cliques ou Setas ◄ ► / Pedal)
-          </span>
+      {/* 🔹 Card 3 — Estação de Prática (40, 768 | 810 × 299) */}
+      <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-[24px] space-y-[20px] relative overflow-hidden group shadow-lg">
+        {/* Título + Subtítulo & compact-toggle-group */}
+        <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
+          <div>
+            <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+              Estação de Prática
+            </h3>
+            <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-[17px] mt-[4px]">
+              Estude a progressão no seu próprio ritmo
+            </p>
+          </div>
 
-          {companionDisplayedChords.length === 0 ? (
-            <div 
-              style={{ paddingTop: '12px', paddingBottom: '12px', marginTop: '8px', marginBottom: '8px', paddingLeft: '12px', paddingRight: '12px', marginLeft: '0px' }}
-              className="py-5 text-center text-zinc-600 font-mono text-xs border border-dashed border-zinc-800 rounded-xl"
+          {/* compact-toggle-group (644, 805 | 182 × 18) */}
+          <div className="flex items-center gap-[8px] shrink-0">
+            <span className="text-[12px] text-[#A1A0AE] font-sans select-none">
+              Modo Compacto (Únicos)
+            </span>
+            <button
+              onClick={() => setCompanionUniqueOnly(!companionUniqueOnly)}
+              className={`w-9 h-5 rounded-full transition-colors relative cursor-pointer ${
+                companionUniqueOnly ? "bg-[#0FE49B]" : "bg-[#0A090E] border border-white/15"
+              }`}
+              title="Filtrar apenas acordes únicos na esteira"
             >
-              NENHUM ACORDE IMPORTADO OU DIGITADO
+              <div
+                className={`w-3.5 h-3.5 rounded-full transition-transform absolute top-[2px] ${
+                  companionUniqueOnly ? "left-[18px] bg-[#0A090E]" : "left-[3px] bg-[#A1A0AE]"
+                }`}
+              />
+            </button>
+          </div>
+        </div>
+
+        {/* Progression strip (64, 856 | 762 × 61 | HORIZONTAL, gap:8) */}
+        <div className="flex items-center gap-[8px] overflow-x-auto pb-1 no-scrollbar w-full min-h-[61px]">
+          {companionDisplayedChords.length === 0 ? (
+            <div className="w-full h-[61px] flex items-center justify-center text-[#6D6B7D] font-mono text-[12px] border border-dashed border-white/10 rounded-[10px] bg-white/[0.02]">
+              NENHUM ACORDE IMPORTADO
             </div>
           ) : (
-            <div 
-              style={{ paddingTop: '12px', paddingBottom: '12px', marginTop: '8px', marginBottom: '8px', paddingLeft: '12px', paddingRight: '12px', marginLeft: '0px' }}
-              className="flex items-center gap-2 overflow-x-auto pb-2 scrollbar-thin scrollbar-thumb-zinc-800 scrollbar-track-transparent pl-[4px] pr-[4px] pt-[6px] pb-[6px]"
-            >
-              {companionDisplayedChords.map((chord, idx) => {
-                const isSelected = companionIndex === idx;
-                return (
-                  <button
-                    key={idx}
-                    onClick={() => setCompanionIndex(idx)}
-                    className={`text-center border transition-all shrink-0 min-w-[70px] flex flex-col justify-center items-center cursor-pointer rounded-[8px] pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[1px] ml-[1px] mt-[1px] mb-[1px] ${
-                      isSelected
-                        ? "bg-accent/15 border-accent text-accent shadow-[0_0_12px_rgba(0,255,170,0.18)] font-black scale-105"
-                        : "bg-[#0d0d0e] border-white/5 text-zinc-400 hover:border-white/15 hover:text-zinc-100"
-                    }`}
-                  >
-                    <span className="text-[10px] text-zinc-500 font-mono">#{idx + 1}</span>
-                    <span className="text-base font-bold tracking-wide mt-0.5">{chord}</span>
-                  </button>
-                );
-              })}
-            </div>
+            companionDisplayedChords.map((chord, idx) => {
+              const isSelected = companionIndex === idx;
+              return (
+                <button
+                  key={idx}
+                  onClick={() => setCompanionIndex(idx)}
+                  className={`w-[88px] h-[61px] min-w-[88px] rounded-[10px] p-[12px] flex flex-col items-center justify-center text-center cursor-pointer transition-all shrink-0 ${
+                    isSelected
+                      ? "bg-[#0FE49B]/[0.08] border border-[#0FE49B] shadow-[0_0_12px_rgba(15,228,155,0.18)]"
+                      : "bg-white/[0.03] border border-white/10 hover:border-white/20"
+                  }`}
+                >
+                  <span className={`text-[10px] font-mono leading-none ${isSelected ? "text-[#0FE49B]" : "text-[#6D6B7D]"}`}>
+                    #{idx + 1}
+                  </span>
+                  <span className={`text-[16px] font-bold font-display mt-[3px] leading-tight ${isSelected ? "text-[#0FE49B]" : "text-[#F4F4F7]"}`}>
+                    {chord}
+                  </span>
+                </button>
+              );
+            })
           )}
         </div>
 
-        {/* Tactical Controls & Page Turner Info */}
-        <div 
-          style={{ paddingLeft: '12px', paddingRight: '12px', paddingTop: '8px', paddingBottom: '8px', marginLeft: '6px', marginRight: '6px', marginTop: '8px', marginBottom: '8px' }}
-          className="flex items-center justify-between gap-4 pt-2 pl-[2px] pr-[2px] pt-[2px] pb-[2px] w-full"
-        >
+        {/* Navigation Controls: btn-anterior (102 × 38), btn-play (46 × 46 r:23), btn-proximo (102 × 38) */}
+        <div className="flex items-center justify-between gap-3 w-full">
+          {/* btn-anterior: 102 × 38 | fill: #FFF @3%, stroke: #FFF, r:8 */}
           <button
             onClick={() => setCompanionIndex((prev) => (prev - 1 + companionDisplayedChords.length) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            className="flex-1 max-w-[284px] rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="w-[102px] h-[38px] bg-white/[0.03] hover:bg-white/[0.07] border border-white/10 text-[#F4F4F7] text-[13px] font-sans font-medium rounded-[8px] flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed"
           >
             ◀ Anterior
           </button>
 
+          {/* btn-play: 46 × 46 | fill: #0FE49B, r:23 (círculo) */}
           <button
             onClick={() => playChordSynth(companionActiveChordParsed?.notes || [])}
             disabled={!companionActiveChordParsed}
-            className="shrink-0 w-11 rounded-[8px] bg-[#0d0d0e] border border-white/10 hover:border-accent/40 text-accent transition-all flex items-center justify-center min-h-[44px] disabled:opacity-40 cursor-pointer pl-[10px] pr-[10px] pt-[10px] pb-[10px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
-            title="Ouvir som do acorde de referência"
+            className="w-[46px] h-[46px] rounded-full bg-[#0FE49B] text-[#0A090E] hover:bg-[#38F9B6] transition-all flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40 shadow-[0_0_14px_rgba(15,228,155,0.3)]"
+            title="Ouvir som do acorde"
           >
-            <Volume2 className="w-5 h-5" />
+            <Play className="w-[20px] h-[20px] fill-current ml-0.5" />
           </button>
 
+          {/* btn-proximo: 102 × 38 | fill: #0FE49B, r:8 */}
           <button
             onClick={() => setCompanionIndex((prev) => (prev + 1) % Math.max(1, companionDisplayedChords.length))}
             disabled={companionDisplayedChords.length <= 1}
-            className="flex-1 max-w-[284px] rounded-[8px] bg-zinc-900 border border-white/5 hover:border-white/15 text-zinc-300 font-bold text-xs uppercase tracking-wider transition-all flex items-center justify-center gap-2 min-h-[44px] disabled:opacity-40 disabled:cursor-not-allowed cursor-pointer pl-[12px] pr-[12px] pt-[12px] pb-[12px] mr-[2px] ml-[2px] mt-[2px] mb-[2px]"
+            className="w-[102px] h-[38px] bg-[#0FE49B] hover:bg-[#38F9B6] text-[#0A090E] text-[13px] font-sans font-semibold rounded-[8px] flex items-center justify-center gap-1.5 transition-all cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_12px_rgba(15,228,155,0.2)]"
           >
             Próximo ▶
           </button>
         </div>
 
-        <p 
-          style={{ fontStyle: 'italic', textAlign: 'center' }}
-          className="text-[10px] text-zinc-500 font-mono uppercase tracking-wide text-center pt-1"
-        >
-          💡 Dica: Use as setas do teclado ◄ e ► (ou seu pedal bluetooth de passar página) para navegar!
-        </p>
+        {/* tip-banner: 762 × 40 | fill: #FFF @3%, stroke: #FFF, r:8, ícone + texto */}
+        <div className="w-full h-[40px] bg-white/[0.03] border border-white/10 rounded-[8px] px-[14px] flex items-center gap-[10px] text-[12px] text-[#A1A0AE] font-sans">
+          <Sparkles className="w-[16px] h-[16px] text-[#0FE49B] shrink-0" />
+          <span className="truncate">
+            Dica: Use as setas do teclado ← e → (ou seu pedal de expressão) para navegar pelos acordes!
+          </span>
+        </div>
       </div>
     </div>
   );
 }
+
