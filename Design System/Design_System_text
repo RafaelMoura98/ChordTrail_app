@@ -1,0 +1,104 @@
+Paleta de Cores
+Cores Primárias, de fundo, texto e estados do Chordtrail.
+Todas as cores seguem o tema dark do aplicativo.
+
+Cor de Destaque (Accent):
+Verde vibrante usado como cor principal de destaque em CTAs, links ativos, badges, ícones e elementos interativos. É a identidade visual do ChordTrail.
+
+accent-primary: #0FE49B - CTAs, ícones ativos, badges
+accent-dark: #059669 - Hover, avatares, estados pressed
+
+Cores de Fundo
+Hierarquia de fundos do tema dark. Variam do mais escuro (base) ao mais claro (cards e superfícies elevadas).
+
+bg-base: #0A090E - Fundo principal da aplicação
+bg-surface-0: #09080E0 - Container de piano
+bg-surface-1: #111016 - Navbar
+bg-surface-2: #16141D - Cards e painéis.
+
+Cores de Texto
+Hierarquia tipográfica em três níveis: primário, secundário e terciário. Garante legibilidade no tema dark.
+
+text-primary: #F4F4F7 - Títulos e texto de destaque.
+text-secondary: #A1A0AE - Descrições e texto auxiliar.
+text-tertiary: #6D6B7D - Placeholders e rótulos discretos.
+
+Cores Semânticas
+Cores de estado para feedback visual: erros, alertas, badges e bordas.
+
+error: #EF4444 - Erros e alertas críticos
+error-light: #FCA5A5 - Texto de erro em fundo escuro
+badge-purple: #A78BFA - Badges BETA
+border-subtle: #FFFFFF - Bordas (7% opacity)
+
+Tipografia
+Famílias tipograficas, escala de tamanhos e pesos utilizados no ChordTrail. Três famílias com funções distintas.
+
+OUTFIT: Display & Branding - usada no logotipo, títulos de seção e nomes de acordes. Geometric sans-serif com personalidade musical. (Pesos: SemiBold, Bold, ExtraBold).
+
+GEIST: UI & Body - Família principal para corpo de texto, labels, navegação e elementos de interface. Clean e altamente legível. (Pesos: Regular, Medium, SemiBold, Bold).
+
+GEIST MONO: Code & Metadata - Monospaced para versões, badges técnicos, intervalos musicais e dados numéricos precisos. (Pesos: Regular, SemiBold).
+
+Escala Tipográfica
+Todos os tamanhos e pesos utilizados no componente, com exemplos visuais.
+
+20px - Display/Logo (Outfit ExtraBold - lh: auto - ls: -0.5px)
+18px - Section Heading (Outfit SemiBold - lh: auto - ls: -)
+16px - Chord Name (Outfit SemiBold - lh: auto - ls: -)
+16px - Card Title (Geist SemiBold - lh: auto - ls: -)
+16px - Input Placeholder (Geist Regular - lh: 100% - ls: -)
+14px - Tab Active/CTA (Geist SemiBold - lh: auto - ls: -)
+14px - Tab/Navigation (Geist Regular - lh: auto - ls: -)
+13px - Label/Keyword (Geist SemiBold - lh: 140% - ls: -)
+13px - Body Text (Geist Regular - lh: 140% - ls: -)
+13px - Category Label (Geist SemiBold - lh: auto - ls: -)
+12px - Caption (Geist Regular - lh: 130% - ls: -)
+12px - Interval Label (Geist Bold - lh: auto - ls: -)
+12px - Range/Code (Geist Mono Regular · lh: auto · ls: -)
+11px - Version Badge (Geist Mono SemiBold · lh: auto · ls: -)
+10px - Micro Label (Geist Mono Regular · lh: auto · ls: -)
+
+Espaçamento & Border Radius
+Escala de espaçamentos (padding, gap, margin) e raios de borda utilizados em todo o sistema.
+
+Escala de espaçamento
+Valores consistentes para padding, gap e margin. A escala segue incrementos de 2px nos menores e saltos maiores a partir de 16px.
+
+1px: spacing/1
+2px: spacing/2
+4px: spacing/4
+6px: spacing/6
+8px: spacing/8
+10px: spacing/10
+12px: spacing/12
+14px: spacing/14
+16px: spacing/16
+18px: spacing/18
+20px: spacing/20
+24px: spacing/24
+28px: spacing/28
+32px: spacing/32
+40px: spacing/40
+60px: spacing/60
+
+Border Radius
+Raios de borda para diferentes componentes. De 3px (inputs menores) até pill/full (badges e toggles).
+
+radius 3px: Micro elements.
+radius 4px: Small badges.
+radius 6px: Tags, chips.
+radius 8px: Buttons, inputs.
+radius 10px: Small cards.
+radius 16px: Section cards.
+radius 23px: Accordes badges.
+radius 100px: Avatars, toggles.
+radius 9999px: Pill shapes.
+
+Dimensões do Layout
+Dimensões das seções principais do layout. A aplicação é full-width a 1440px com três áreas: navbar, conteúdo principal e painel ao vivo do piano.
+
+Viewport: 1440px x 1777px - Largura total do layout desktop.
+Nav Bar: 1440px x 70px - Barra de navegação superior fixa.
+Main Container: 1440px x 1257px - Área de conteúdo principal com cards e ferramentas.
+Bottom Live Panel: 1440px x 326px - Painel inferior com teclado MIDI ao vivo.

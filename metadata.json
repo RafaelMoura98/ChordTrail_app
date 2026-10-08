@@ -1,0 +1,6 @@
+{
+  "name": "ChordTrail",
+  "description": "Estação de trabalho harmônica e prática musical interativa baseada na web com integração MIDI.",
+  "requestFramePermissions": [],
+  "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
+}
