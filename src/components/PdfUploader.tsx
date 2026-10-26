@@ -123,25 +123,25 @@ export function PdfUploader({ onChordsExtracted, style }: PdfUploaderProps) {
   return (
     <div
       style={style}
-      className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-[24px] space-y-[16px] relative overflow-hidden group shadow-lg"
+      className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-6 sm:p-7 space-y-5 relative overflow-hidden group shadow-lg"
     >
-      {/* 🔹 Título & Subtítulo (Outfit SemiBold 18px & Geist Regular 13px) */}
+      {/* 🔹 Título & Subtítulo */}
       <div>
-        <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+        <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-tight">
           Upload de Cifra // PDF
         </h3>
-        <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-[17px] mt-[4px]">
+        <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-normal mt-1.5">
           Importe arquivos do Moises ou Cifra Club
         </p>
       </div>
 
-      {/* 🔹 Upload Zone: 761 × 129 | fill: #0FE49B @8%, stroke: #0FE49B dashed 6 4, r:12 */}
+      {/* 🔹 Upload Zone */}
       <div
         onDragEnter={handleDrag}
         onDragOver={handleDrag}
         onDragLeave={handleDrag}
         onDrop={handleDrop}
-        className={`w-full h-[129px] rounded-[12px] p-[20px] border border-dashed transition-all flex flex-col items-center justify-center text-center cursor-pointer relative ${
+        className={`w-full min-h-[140px] rounded-[12px] p-6 border border-dashed transition-all flex flex-col items-center justify-center text-center cursor-pointer relative ${
           isDragActive
             ? 'bg-[#0FE49B]/[0.15] border-[#0FE49B] shadow-[0_0_16px_rgba(15,228,155,0.25)]'
             : 'bg-[#0FE49B]/[0.08] border-[#0FE49B] hover:bg-[#0FE49B]/[0.12]'
@@ -156,8 +156,8 @@ export function PdfUploader({ onChordsExtracted, style }: PdfUploaderProps) {
         />
 
         {isParsingPdf ? (
-          <div className="flex flex-col items-center justify-center gap-[6px] text-[#0FE49B]">
-            <Loader2 className="w-[24px] h-[24px] animate-spin" />
+          <div className="flex flex-col items-center justify-center gap-2 text-[#0FE49B]">
+            <Loader2 className="w-[26px] h-[26px] animate-spin" />
             <p className="font-sans font-semibold text-[14px] text-[#F4F4F7]">
               Analisando PDF de Cifras...
             </p>
@@ -166,8 +166,8 @@ export function PdfUploader({ onChordsExtracted, style }: PdfUploaderProps) {
             </p>
           </div>
         ) : pdfSuccess ? (
-          <div className="flex flex-col items-center justify-center gap-[4px] text-[#0FE49B]">
-            <Check className="w-[24px] h-[24px] stroke-[2.5]" />
+          <div className="flex flex-col items-center justify-center gap-2 text-[#0FE49B]">
+            <Check className="w-[26px] h-[26px] stroke-[2.5]" />
             <p className="font-sans font-semibold text-[14px] text-[#0FE49B]">
               Cifras importadas com sucesso!
             </p>
@@ -178,23 +178,23 @@ export function PdfUploader({ onChordsExtracted, style }: PdfUploaderProps) {
         ) : (
           <label
             htmlFor="pdf-companion-file-input"
-            className="w-full flex flex-col items-center justify-center gap-[6px] cursor-pointer"
+            className="w-full flex flex-col items-center justify-center gap-2 cursor-pointer"
           >
-            {/* Ícone 24 × 24 centralizado em #0FE49B */}
-            <div className="w-[24px] h-[24px] text-[#0FE49B] flex items-center justify-center">
-              <FileUp className="w-[24px] h-[24px] stroke-[2]" />
+            {/* Ícone centralizado em #0FE49B */}
+            <div className="w-[28px] h-[28px] text-[#0FE49B] flex items-center justify-center">
+              <FileUp className="w-[26px] h-[26px] stroke-[2]" />
             </div>
 
-            {/* Texto upload principal: Geist SemiBold 14px */}
-            <p className="font-sans font-semibold text-[14px] text-[#F4F4F7] leading-tight">
+            {/* Texto upload principal */}
+            <p className="font-sans font-semibold text-[14px] text-[#F4F4F7] leading-normal">
               Arraste o PDF de cifra aqui ou{' '}
               <span className="text-[#0FE49B] underline hover:text-[#38F9B6] transition-colors">
                 escolha um arquivo
               </span>
             </p>
 
-            {/* Texto upload secundário: Geist Regular 12px, #A1A0AE */}
-            <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-tight">
+            {/* Texto upload secundário */}
+            <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-normal">
               Formato PDF contendo cifras musicais estruturadas
             </p>
           </label>

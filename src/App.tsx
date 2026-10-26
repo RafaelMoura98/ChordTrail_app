@@ -236,19 +236,19 @@ export default function App() {
   }, [companionDisplayedChords.length]);
 
   return (
-    <div className="min-h-screen bg-[#0A090E] text-[#F4F4F7] flex flex-col font-sans px-[16px] sm:px-[24px] selection:bg-[#0FE49B] selection:text-[#0A090E]">
+    <div className="min-h-screen bg-[#0A090E] text-[#F4F4F7] flex flex-col font-sans px-4 sm:px-6 md:px-8 xl:px-12 py-4 sm:py-6 selection:bg-[#0FE49B] selection:text-[#0A090E]">
       {/* 🔹 NAV-BAR (1440 × 70 | bg: #111016, border: white/7%, r:12) */}
-      <header className="h-[70px] bg-[#111016] border border-white/[0.07] rounded-[12px] flex items-center px-6 my-[16px] mb-[24px] shadow-lg max-w-[1360px] w-full mx-auto">
-        <div className="w-full flex items-center justify-between gap-[16px]">
+      <header className="h-[70px] bg-[#111016] border border-white/[0.07] rounded-[14px] flex items-center px-6 mb-6 shadow-lg max-w-[1360px] w-full mx-auto">
+        <div className="w-full flex items-center justify-between gap-4">
           {/* Left Brand Area */}
-          <div className="flex items-center gap-[12px] shrink-0">
+          <div className="flex items-center gap-3 shrink-0">
             {/* logo-icon: 32x32, fill #0FE49B, r:8 */}
             <div className="w-[32px] h-[32px] bg-[#0FE49B] rounded-[8px] flex items-center justify-center text-[#0A090E] shrink-0 shadow-[0_0_12px_rgba(15,228,155,0.3)]">
               <AudioWaveform className="w-[18px] h-[18px] stroke-[2.5]" />
             </div>
 
             {/* Brand Title & Badge Container */}
-            <div className="flex items-center gap-[10px]">
+            <div className="flex items-center gap-2.5">
               <span className="font-display font-extrabold text-[20px] text-[#F4F4F7] tracking-[-0.5px] leading-none">
                 ChordTrail
               </span>
@@ -261,9 +261,9 @@ export default function App() {
           </div>
 
           {/* Right Navigation Tabs Area */}
-          <div className="flex items-center gap-[8px] shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             {/* tab-esteira (ativo) */}
-            <div className="px-[12px] h-[34px] bg-[#0FE49B]/[0.08] border border-[#0FE49B] rounded-[8px] text-[#0FE49B] font-sans font-medium text-[13px] flex items-center justify-center gap-[6px] shadow-[0_0_10px_rgba(15,228,155,0.15)] transition-all">
+            <div className="px-3.5 h-[34px] bg-[#0FE49B]/[0.08] border border-[#0FE49B] rounded-[8px] text-[#0FE49B] font-sans font-medium text-[13px] flex items-center justify-center gap-2 shadow-[0_0_10px_rgba(15,228,155,0.15)] transition-all">
               <span className="w-[6px] h-[6px] rounded-full bg-[#0FE49B] animate-pulse"></span>
               Esteira de Acordes &amp; Harmonia Teórica
             </div>
@@ -271,11 +271,11 @@ export default function App() {
         </div>
       </header>
 
-      {/* 🔹 MAIN CONTAINER (1360px total width: 810px esquerda + 510px direita + 24px gap) */}
-      <main className="flex-1 w-full max-w-[1360px] mx-auto flex flex-col lg:flex-row gap-[24px] items-start">
-        {/* 🔹 COLUNA ESQUERDA (810px wide) */}
-        <div className="w-full lg:w-[810px] space-y-[24px] shrink-0">
-          {/* Card 1 — TutorIA (810 × 380) */}
+      {/* 🔹 MAIN CONTAINER (Grid responsiva fluida: 7 cols esquerda + 5 cols direita em telas grandes) */}
+      <main className="flex-1 w-full max-w-[1360px] mx-auto grid grid-cols-1 lg:grid-cols-12 gap-6 items-start">
+        {/* 🔹 COLUNA ESQUERDA (lg:col-span-7) */}
+        <div className="w-full lg:col-span-7 space-y-6">
+          {/* Card 1 — TutorIA */}
           <TutorIA
             activeChord={companionActiveChordSymbol}
             songChords={companionChords}
@@ -283,7 +283,7 @@ export default function App() {
             onPlayChord={(chord) => handlePlayChordSynthFromSymbol(chord)}
           />
 
-          {/* Card 2 — Upload de Cifra // PDF (810 × 238) */}
+          {/* Card 2 — Upload de Cifra // PDF */}
           <PdfUploader
             onChordsExtracted={(newChords) => {
               setCompanionText(newChords);
@@ -291,7 +291,7 @@ export default function App() {
             }}
           />
 
-          {/* Card 3 — Esteira de Acordes // Progressão (810 × 299) */}
+          {/* Card 3 — Esteira de Acordes // Progressão */}
           <ChordsConveyorCard
             companionText={companionText}
             setCompanionText={setCompanionText}
@@ -305,7 +305,7 @@ export default function App() {
             companionActiveChordParsed={companionActiveChordParsed}
           />
 
-          {/* Card 4 — Acorde Alvo / Piano (810 × 268) */}
+          {/* Card 4 — Acorde Alvo / Piano */}
           {companionActiveChordParsed ? (
             <PianoKeyboard
               idContainer="companion-live-keyboard"
@@ -325,15 +325,15 @@ export default function App() {
               useFlats={['Db', 'Eb', 'Gb', 'Ab', 'Bb', 'F'].includes(companionActiveChordParsed.rootNote)}
             />
           ) : (
-            <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-[20px] text-center font-mono text-[#A1A0AE] text-[13px] shadow-lg">
+            <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-6 text-center font-mono text-[#A1A0AE] text-[13px] shadow-lg">
               Nenhum acorde ativo para visualização no Teclado Guia.
             </div>
           )}
         </div>
 
-        {/* 🔹 COLUNA DIREITA (510px wide) */}
-        <div className="w-full lg:w-[510px] space-y-[24px] shrink-0">
-          {/* Card 5 — Conexão MIDI Hardware (510 × 159) */}
+        {/* 🔹 COLUNA DIREITA (lg:col-span-5) */}
+        <div className="w-full lg:col-span-5 space-y-6">
+          {/* Card 5 — Conexão MIDI Hardware */}
           <MidiConnectionCard
             midiAccess={midiAccess}
             midiInputs={midiInputs}
@@ -342,7 +342,7 @@ export default function App() {
             midiNotesPressed={midiNotesPressed}
           />
 
-          {/* Card 6 — Dicionário Compacto / Variações da Tônica (510 × 720) */}
+          {/* Card 6 — Dicionário Compacto / Variações da Tônica */}
           <CompactChordDictionary
             onSelectChord={(chord) => {
               setCompanionText(chord);
@@ -352,7 +352,7 @@ export default function App() {
             activeChordSymbol={companionActiveChordSymbol}
           />
 
-          {/* Card 7 — Estrutura Harmônica (510 × 336) */}
+          {/* Card 7 — Estrutura Harmônica */}
           <HarmonicStructureCard
             parsedChord={companionActiveChordParsed}
             activeChordSymbol={companionActiveChordSymbol || 'C6'}
@@ -363,8 +363,8 @@ export default function App() {
       </main>
 
       {/* 🔹 BOTTOM LIVE PANEL (1360px wide) */}
-      <footer className="w-full max-w-[1360px] mx-auto px-0 pt-[24px] pb-[32px] space-y-[16px] mt-auto">
-        {/* Card 8 — MIDI Status Bar (1360 × 50) */}
+      <footer className="w-full max-w-[1360px] mx-auto px-0 pt-6 pb-10 space-y-4 mt-auto">
+        {/* Card 8 — MIDI Status Bar */}
         <MidiStatusBar
           isConnected={midiInputs.length > 0}
           deviceName={midiInputs.find((i) => i.id === selectedMidiInputId)?.name || midiInputs[0]?.name}
@@ -374,7 +374,7 @@ export default function App() {
           activeNoteNames={midiNotesPressed.map((m) => NOTES_CHROMATIC_SHARP[m % 12])}
         />
 
-        {/* Card 9 — Teclado MIDI Ao Vivo (1360 × 248) */}
+        {/* Card 9 — Teclado MIDI Ao Vivo */}
         <LiveMidiPianoCard
           isConnected={midiInputs.length > 0}
           activeMidiNotes={midiNotesPressed}

@@ -173,30 +173,30 @@ export function PianoKeyboard({
     <div
       id={idContainer}
       style={style}
-      className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-[24px] space-y-[16px] shadow-lg relative overflow-hidden"
+      className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-6 sm:p-7 space-y-5 shadow-lg relative overflow-hidden"
     >
       {/* Header: Título + Subtítulo & btn-guia */}
       <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-3">
         <div className="max-w-[630px]">
-          <div className="flex items-center gap-2 flex-wrap">
-            <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+          <div className="flex items-center gap-2.5 flex-wrap">
+            <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-tight">
               {title}
             </h3>
             {inversionDesc && (
-              <span className="px-2 py-0.5 rounded-[4px] bg-[#0FE49B]/15 border border-[#0FE49B]/40 text-[#0FE49B] font-mono font-bold text-[10px]">
+              <span className="px-2.5 py-0.5 rounded-[5px] bg-[#0FE49B]/15 border border-[#0FE49B]/40 text-[#0FE49B] font-mono font-bold text-[10px]">
                 {inversionDesc}
               </span>
             )}
           </div>
           {subtitle && (
-            <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-[17px] mt-[4px]">
+            <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-normal mt-1.5">
               {subtitle}
             </p>
           )}
         </div>
 
-        {/* btn-guia: 131 × 27 | fill: #FFF @ 2.7%, stroke: #0FE49B, r:6 */}
-        <div className="w-[131px] h-[27px] bg-white/[0.027] border border-[#0FE49B] rounded-[6px] text-[#0FE49B] font-mono text-[11px] font-semibold flex items-center justify-center gap-1.5 shrink-0 select-none shadow-[0_0_8px_rgba(15,228,155,0.15)]">
+        {/* btn-guia */}
+        <div className="h-[28px] px-3 bg-white/[0.027] border border-[#0FE49B] rounded-[6px] text-[#0FE49B] font-mono text-[11px] font-semibold flex items-center justify-center gap-1.5 shrink-0 select-none shadow-[0_0_8px_rgba(15,228,155,0.15)]">
           <Sparkles className="w-[13px] h-[13px] text-[#0FE49B]" />
           <span>{badgeText}</span>
         </div>

@@ -21,10 +21,10 @@ export function MidiStatusBar({
   // 🔹 Estado de Erro / Offline (Consistente com as diretrizes do Card de Conexão MIDI)
   if (!isConnected) {
     return (
-      <div className="w-full min-h-[50px] bg-[#EF4444]/[0.05] border border-[#EF4444]/60 rounded-[10px] px-[16px] py-[8px] flex items-center justify-between shadow-lg overflow-hidden transition-colors">
-        <div className="flex items-center gap-[12px] min-w-0 flex-1">
+      <div className="w-full min-h-[52px] bg-[#EF4444]/[0.05] border border-[#EF4444]/60 rounded-[10px] px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-lg overflow-hidden transition-colors">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* Indicador vermelho (dot + ícone) */}
-          <div className="flex items-center gap-[8px] shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="w-[8px] h-[8px] rounded-full bg-[#EF4444] shadow-[0_0_8px_#EF4444] animate-pulse" />
             <AlertTriangle className="w-[14px] h-[14px] text-[#EF4444] shrink-0" />
             <span className="font-sans font-semibold text-[13px] text-[#FCA5A5] whitespace-nowrap">
@@ -41,8 +41,8 @@ export function MidiStatusBar({
         </div>
 
         {/* Badge "# OFFLINE" */}
-        <div className="shrink-0 ml-[12px]">
-          <div className="w-[84px] h-[22px] rounded-full bg-[#EF4444]/[0.10] border border-[#EF4444]/40 flex items-center justify-center">
+        <div className="shrink-0 ml-3">
+          <div className="w-[88px] h-[24px] rounded-full bg-[#EF4444]/[0.10] border border-[#EF4444]/40 flex items-center justify-center">
             <span className="font-mono font-bold text-[10px] text-[#EF4444] tracking-wider leading-none">
               # OFFLINE
             </span>
@@ -55,10 +55,10 @@ export function MidiStatusBar({
   // 🔹 Estado Ativo (Conectado - Tocando teclas ao vivo)
   if (notesPressedCount > 0) {
     return (
-      <div className="w-full min-h-[50px] bg-[#0FE49B]/[0.08] border border-[#0FE49B] rounded-[10px] px-[16px] py-[8px] flex items-center justify-between shadow-lg overflow-hidden transition-all">
-        <div className="flex items-center gap-[12px] min-w-0 flex-1">
+      <div className="w-full min-h-[52px] bg-[#0FE49B]/[0.08] border border-[#0FE49B] rounded-[10px] px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-lg overflow-hidden transition-all">
+        <div className="flex items-center gap-3 min-w-0 flex-1">
           {/* Indicador de execução ao vivo */}
-          <div className="flex items-center gap-[8px] shrink-0">
+          <div className="flex items-center gap-2 shrink-0">
             <div className="w-[8px] h-[8px] rounded-full bg-[#0FE49B] shadow-[0_0_10px_#0FE49B] animate-ping" />
             <span className="font-display font-bold text-[14px] text-[#0FE49B] whitespace-nowrap">
               {detectedChordName || 'Harmonia ao Vivo'}
@@ -68,8 +68,8 @@ export function MidiStatusBar({
           <div className="w-px h-[14px] bg-[#0FE49B]/30 shrink-0" />
 
           {/* Detalhes das notas tocadas */}
-          <div className="flex items-center gap-[8px] min-w-0 overflow-hidden">
-            <span className="font-mono text-[11px] text-[#0A090E] font-bold bg-[#0FE49B] px-[8px] py-[2px] rounded-[4px] shrink-0">
+          <div className="flex items-center gap-2 min-w-0 overflow-hidden">
+            <span className="font-mono text-[11px] text-[#0A090E] font-bold bg-[#0FE49B] px-2.5 py-0.5 rounded-[4px] shrink-0">
               {notesPressedCount} {notesPressedCount === 1 ? 'tecla' : 'teclas'}
               {activeNoteNames.length > 0 && ` (${activeNoteNames.join(' · ')})`}
             </span>
@@ -83,8 +83,8 @@ export function MidiStatusBar({
         </div>
 
         {/* Badge "# AO VIVO" */}
-        <div className="shrink-0 ml-[12px]">
-          <div className="w-[84px] h-[22px] rounded-full bg-[#0FE49B]/[0.15] border border-[#0FE49B] flex items-center justify-center gap-[4px]">
+        <div className="shrink-0 ml-3">
+          <div className="w-[88px] h-[24px] rounded-full bg-[#0FE49B]/[0.15] border border-[#0FE49B] flex items-center justify-center gap-1">
             <Music className="w-[10px] h-[10px] text-[#0FE49B]" />
             <span className="font-mono font-bold text-[10px] text-[#0FE49B] tracking-wider leading-none">
               AO VIVO
@@ -97,10 +97,10 @@ export function MidiStatusBar({
 
   // 🔹 Estado Ativo (Conectado - Aguardando teclas)
   return (
-    <div className="w-full min-h-[50px] bg-[#0FE49B]/[0.04] border border-[#0FE49B]/40 rounded-[10px] px-[16px] py-[8px] flex items-center justify-between shadow-lg overflow-hidden transition-colors">
-      <div className="flex items-center gap-[12px] min-w-0 flex-1">
+    <div className="w-full min-h-[52px] bg-[#0FE49B]/[0.04] border border-[#0FE49B]/40 rounded-[10px] px-4 sm:px-6 py-2.5 flex items-center justify-between shadow-lg overflow-hidden transition-colors">
+      <div className="flex items-center gap-3 min-w-0 flex-1">
         {/* Dot verde online */}
-        <div className="flex items-center gap-[8px] shrink-0">
+        <div className="flex items-center gap-2 shrink-0">
           <div className="w-[8px] h-[8px] rounded-full bg-[#0FE49B] shadow-[0_0_8px_#0FE49B]" />
           <CheckCircle2 className="w-[14px] h-[14px] text-[#0FE49B] shrink-0" />
           <span className="font-sans font-medium text-[13px] text-[#0FE49B] whitespace-nowrap">
@@ -117,8 +117,8 @@ export function MidiStatusBar({
       </div>
 
       {/* Badge "# ONLINE" */}
-      <div className="shrink-0 ml-[12px]">
-        <div className="w-[84px] h-[22px] rounded-full bg-[#0FE49B]/[0.08] border border-[#0FE49B]/30 flex items-center justify-center">
+      <div className="shrink-0 ml-3">
+        <div className="w-[88px] h-[24px] rounded-full bg-[#0FE49B]/[0.08] border border-[#0FE49B]/30 flex items-center justify-center">
           <span className="font-mono font-bold text-[10px] text-[#0FE49B] tracking-wider leading-none">
             # ONLINE
           </span>

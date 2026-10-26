@@ -133,20 +133,20 @@ export function TutorIA({
   };
 
   return (
-    <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-[24px] space-y-[16px] relative overflow-hidden group shadow-lg flex flex-col">
+    <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-6 sm:p-7 space-y-5 relative overflow-hidden group shadow-lg flex flex-col">
       {/* 🔹 Header: Título "TutorIA" + Badge BETA + Botão Limpar */}
       <div className="flex items-center justify-between relative z-10">
         <div>
-          <div className="flex items-center gap-[8px]">
-            <h3 className="text-[18px] font-semibold text-[#F4F4F7] font-display leading-[23px]">
+          <div className="flex items-center gap-2.5">
+            <h3 className="text-[18px] font-semibold text-[#F4F4F7] font-display leading-tight">
               TutorIA
             </h3>
-            {/* badge BETA: 47 × 22 | fill: #8B5CF6 @ 12.5%, text: #A78BFA, r:11 */}
-            <span className="w-[47px] h-[22px] bg-[#8B5CF6]/[0.125] rounded-full text-[#A78BFA] text-[11px] font-mono font-semibold flex items-center justify-center tracking-wider shrink-0">
+            {/* badge BETA */}
+            <span className="px-2.5 py-0.5 bg-[#8B5CF6]/[0.125] rounded-full text-[#A78BFA] text-[11px] font-mono font-semibold flex items-center justify-center tracking-wider shrink-0">
               BETA
             </span>
           </div>
-          <p className="text-[13px] text-[#A1A0AE] font-sans mt-[4px] leading-[17px]">
+          <p className="text-[13px] text-[#A1A0AE] font-sans mt-1.5 leading-normal">
             Mentor de harmonia musical
           </p>
         </div>
@@ -161,14 +161,14 @@ export function TutorIA({
         </button>
       </div>
 
-      {/* 🔹 Área de Mensagens (Scroll suave: 180px) */}
-      <div className="space-y-[12px] max-h-[190px] overflow-y-auto pr-1 text-[13px]">
+      {/* 🔹 Área de Mensagens (Scroll suave com respiro aumentado) */}
+      <div className="space-y-3.5 max-h-[220px] overflow-y-auto pr-1 text-[13px]">
         {messages.map((msg, idx) => {
           const isUser = msg.role === "user";
           return (
             <div
               key={idx}
-              className={`flex items-start gap-[10px] ${isUser ? "justify-end" : "justify-start"}`}
+              className={`flex items-start gap-2.5 ${isUser ? "justify-end" : "justify-start"}`}
             >
               {!isUser && (
                 /* Avatar Assistant: 28 × 28, r:14, fill: #059669 (accent-dark) */
@@ -178,28 +178,28 @@ export function TutorIA({
               )}
 
               <div
-                className={`p-[12px] rounded-[8px] max-w-[88%] leading-[140%] ${
+                className={`p-3.5 sm:p-4 rounded-[10px] max-w-[88%] leading-relaxed ${
                   isUser
                     ? "bg-[#0A090E] border border-[#0FE49B]/50 text-[#F4F4F7]"
                     : "bg-white/[0.027] border border-white/[0.07] text-[#F4F4F7]"
                 }`}
               >
-                <div className="markdown-body text-[13px] font-sans">
+                <div className="markdown-body text-[13px] font-sans leading-relaxed [&>p]:mb-2.5 last:[&>p]:mb-0 [&>ol]:my-1.5 [&>ol]:pl-4 [&>ul]:my-1.5 [&>ul]:pl-4">
                   <Markdown>{msg.text}</Markdown>
                 </div>
 
                 {/* Acordes interativos sugeridos pela IA */}
                 {!isUser && msg.detectedChords && msg.detectedChords.length > 0 && (
-                  <div className="flex flex-wrap items-center gap-[6px] pt-2 mt-2 border-t border-white/[0.07]">
+                  <div className="flex flex-wrap items-center gap-2 pt-3 mt-3 border-t border-white/[0.07]">
                     <span className="text-[10px] font-mono text-[#6D6B7D] uppercase font-bold mr-1">
                       Acordes:
                     </span>
                     {msg.detectedChords.map((chord, cIdx) => (
                       <div
                         key={cIdx}
-                        className="flex items-center bg-[#0A090E] border border-white/[0.07] rounded-[4px] px-[8px] py-[2px] text-[11px] font-mono text-[#F4F4F7]"
+                        className="flex items-center bg-[#0A090E] border border-white/[0.07] rounded-[6px] px-2.5 py-1 text-[11px] font-mono text-[#F4F4F7] gap-1.5"
                       >
-                        <span className="font-bold text-[#0FE49B] mr-1.5">{chord}</span>
+                        <span className="font-bold text-[#0FE49B]">{chord}</span>
                         <div className="flex items-center gap-1">
                           <button
                             onClick={() => onSelectChord(chord)}
@@ -233,11 +233,11 @@ export function TutorIA({
         })}
 
         {isLoading && (
-          <div className="flex items-start gap-[10px]">
+          <div className="flex items-start gap-2.5">
             <div className="w-[28px] h-[28px] rounded-full bg-[#059669] text-[#F4F4F7] flex items-center justify-center shrink-0 mt-0.5">
               <Bot className="w-3.5 h-3.5" />
             </div>
-            <div className="bg-white/[0.027] border border-white/[0.07] p-[10px] rounded-[8px] flex items-center gap-2 text-[#A1A0AE] text-[12px] font-mono">
+            <div className="bg-white/[0.027] border border-white/[0.07] p-3 rounded-[8px] flex items-center gap-2 text-[#A1A0AE] text-[12px] font-mono">
               <Loader2 className="w-3.5 h-3.5 animate-spin text-[#0FE49B]" />
               <span>Analisando harmonia...</span>
             </div>
@@ -247,40 +247,40 @@ export function TutorIA({
         <div ref={messagesEndRef} />
       </div>
 
-      {/* 🔹 Alerta de Erro (770 × 36 | fill: #EF4444 @ 5%, stroke: #EF4444, r:8) */}
+      {/* 🔹 Alerta de Erro */}
       {errorMessage && (
-        <div className="w-full min-h-[36px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[8px] px-3 py-1.5 text-[12px] text-[#FCA5A5] flex items-center gap-2">
+        <div className="w-full min-h-[38px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[8px] px-3.5 py-2 text-[12px] text-[#FCA5A5] flex items-center gap-2">
           <AlertTriangle className="w-4 h-4 text-[#EF4444] shrink-0" />
           <span>{errorMessage}</span>
         </div>
       )}
 
-      {/* 🔹 Action Chips (fill: #FFF @ 2.7%, stroke: #FFF @ 7%, r:6, pad: 6 10) */}
-      <div className="flex flex-wrap items-center gap-[6px] pt-1">
+      {/* 🔹 Action Chips */}
+      <div className="flex flex-wrap items-center gap-2 pt-1">
         <button
           onClick={() => handlePresetClick("rearm")}
-          className="h-[28px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-[10px] rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
+          className="h-[30px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-3 rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
         >
           Rearmonização
         </button>
 
         <button
           onClick={() => handlePresetClick("agilidade")}
-          className="h-[28px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-[10px] rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
+          className="h-[30px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-3 rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
         >
           Exercício Agilidade
         </button>
 
         <button
           onClick={() => handlePresetClick("modos")}
-          className="h-[28px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-[10px] rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
+          className="h-[30px] bg-white/[0.027] border border-white/[0.07] hover:border-[#0FE49B] text-[#A1A0AE] hover:text-[#0FE49B] text-[12px] font-medium px-3 rounded-[6px] transition-all flex items-center justify-center cursor-pointer"
         >
           Modos Gregos
         </button>
       </div>
 
-      {/* 🔹 Chat Input: 770 × 40 | fill: #FFF @ 2.7%, stroke: #FFF @ 7%, r:8 | Send-btn: 28 × 28, fill: #0FE49B, r:6 */}
-      <div className="w-full h-[40px] bg-white/[0.027] border border-white/[0.07] rounded-[8px] p-[6px] flex items-center gap-2 focus-within:border-[#0FE49B]/50 transition-colors">
+      {/* 🔹 Chat Input */}
+      <div className="w-full h-[44px] bg-white/[0.027] border border-white/[0.07] rounded-[10px] px-3 py-1 flex items-center gap-2 focus-within:border-[#0FE49B]/50 transition-colors">
         <input
           type="text"
           value={inputValue}
@@ -292,7 +292,7 @@ export function TutorIA({
         <button
           onClick={() => handleSendMessage(inputValue)}
           disabled={!inputValue.trim() || isLoading}
-          className="w-[28px] h-[28px] rounded-[6px] bg-[#0FE49B] text-[#0A090E] hover:bg-[#059669] transition-all flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(15,228,155,0.25)]"
+          className="w-[30px] h-[30px] rounded-[6px] bg-[#0FE49B] text-[#0A090E] hover:bg-[#059669] transition-all flex items-center justify-center shrink-0 cursor-pointer disabled:opacity-40 disabled:cursor-not-allowed shadow-[0_0_10px_rgba(15,228,155,0.25)]"
           title="Enviar"
           aria-label="Enviar pergunta"
         >

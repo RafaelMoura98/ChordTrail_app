@@ -89,15 +89,15 @@ export function HarmonicStructureCard({
   };
 
   return (
-    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-[20px] sm:p-[24px] shadow-lg relative overflow-hidden space-y-[16px]">
+    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-6 sm:p-7 shadow-lg relative overflow-hidden space-y-5">
       {/* 🔹 Header: Título "Estrutura Harmônica" */}
       <div className="flex items-center justify-between w-full">
         <div>
-          <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+          <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-tight">
             Estrutura Harmônica
           </h3>
           {/* 🔹 Subtítulo teórico */}
-          <p className="font-sans text-[13px] leading-[17px] mt-[4px]">
+          <p className="font-sans text-[13px] leading-normal mt-1.5">
             <span className="font-bold text-[#F4F4F7]">Nome Teórico: </span>
             <span className="font-normal text-[#A1A0AE]">{theoreticalFullName}</span>
           </p>
@@ -105,7 +105,7 @@ export function HarmonicStructureCard({
 
         <button
           onClick={handlePlayFullChord}
-          className="h-[28px] px-[10px] rounded-[6px] bg-white/[0.03] hover:bg-[#0FE49B]/10 border border-[#0FE49B] text-[#0FE49B] font-mono text-[11px] font-semibold transition-all flex items-center gap-[6px] cursor-pointer"
+          className="h-[28px] px-2.5 rounded-[6px] bg-white/[0.03] hover:bg-[#0FE49B]/10 border border-[#0FE49B] text-[#0FE49B] font-mono text-[11px] font-semibold transition-all flex items-center gap-1.5 cursor-pointer"
           title="Ouvir acorde completo"
         >
           <Volume2 className="w-[13px] h-[13px]" />
@@ -126,7 +126,7 @@ export function HarmonicStructureCard({
       )}
 
       {/* 🔹 Notas da estrutura */}
-      <div className="w-full space-y-[4px] pt-1">
+      <div className="w-full space-y-1.5 pt-1">
         {notes.map((note, idx) => {
           const intervalInfo = INTERVAL_DESCRIPTIONS[note.interval] || {
             name: `Intervalo +${note.interval} st`,
@@ -139,10 +139,10 @@ export function HarmonicStructureCard({
           return (
             <div
               key={idx}
-              className="w-full h-[38px] rounded-[8px] px-[12px] bg-white/[0.027] border border-white/[0.07] hover:border-white/20 hover:bg-white/[0.05] transition-all flex items-center justify-between group"
+              className="w-full h-[42px] rounded-[8px] px-3.5 bg-white/[0.027] border border-white/[0.07] hover:border-white/20 hover:bg-white/[0.05] transition-all flex items-center justify-between group"
             >
               {/* Esquerda: Indicador circular + Nome da Nota e Tônica/Baixo */}
-              <div className="flex items-center gap-[10px] min-w-0">
+              <div className="flex items-center gap-3 min-w-0">
                 <div
                   className={`w-[14px] h-[14px] rounded-full flex items-center justify-center shrink-0 ${
                     isBass && currentParsed?.bassNote && currentParsed?.bassNote !== currentParsed?.rootNote
@@ -174,8 +174,8 @@ export function HarmonicStructureCard({
               </div>
 
               {/* Direita: Intervalo / Semitons / Botão de Play */}
-              <div className="flex items-center gap-[8px] shrink-0">
-                <span className={`px-[6px] py-[2px] rounded-[4px] text-[10px] font-mono font-bold border ${
+              <div className="flex items-center gap-2 shrink-0">
+                <span className={`px-2 py-0.5 rounded-[4px] text-[10px] font-mono font-bold border ${
                   isBass && currentParsed?.bassNote && currentParsed?.bassNote !== currentParsed?.rootNote
                     ? 'bg-[#38BDF8]/20 text-[#38BDF8] border-[#38BDF8]/30'
                     : 'bg-black/40 text-[#A1A0AE] border-white/5'
@@ -191,7 +191,7 @@ export function HarmonicStructureCard({
 
                 <button
                   onClick={() => handleSoundNote(note.frequency)}
-                  className="w-[26px] h-[26px] rounded-[6px] bg-white/[0.05] hover:bg-[#0FE49B] hover:text-[#0A090E] text-[#A1A0AE] transition-all flex items-center justify-center cursor-pointer"
+                  className="w-[28px] h-[28px] rounded-[6px] bg-white/[0.05] hover:bg-[#0FE49B] hover:text-[#0A090E] text-[#A1A0AE] transition-all flex items-center justify-center cursor-pointer"
                   title={`Tocar nota ${note.noteName}${note.octave}`}
                 >
                   <Play className="w-[11px] h-[11px] fill-current" />

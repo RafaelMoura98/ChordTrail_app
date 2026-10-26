@@ -158,22 +158,22 @@ export function CompactChordDictionary({
   };
 
   return (
-    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-[20px] sm:p-[24px] shadow-lg relative overflow-hidden">
+    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-6 sm:p-7 shadow-lg relative overflow-hidden space-y-5">
       {/* 🔹 Título "Variações da Tônica // C" */}
       <div className="w-full flex items-center justify-between">
         <div>
-          <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-[23px]">
+          <h3 className="font-display font-semibold text-[18px] text-[#F4F4F7] leading-tight">
             Variações da Tônica // {selectedRoot}
           </h3>
-          <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-[17px] mt-[4px]">
+          <p className="font-sans font-normal text-[13px] text-[#A1A0AE] leading-normal mt-1.5">
             Explore extensões, tétrades e inversões harmônicas
           </p>
         </div>
       </div>
 
-      <div className="mt-[16px] space-y-[12px]">
+      <div className="space-y-3">
         {/* 🔹 note-tabs (C D E F G A B) */}
-        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-[4px] flex items-center gap-[4px]">
+        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-1 flex items-center gap-1">
           {BASE_NOTES.map((note) => {
             const isActive = baseNote === note;
             return (
@@ -193,7 +193,7 @@ export function CompactChordDictionary({
         </div>
 
         {/* 🔹 Maior/menor/dim/aug-tabs */}
-        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-[4px] flex items-center gap-[4px] overflow-x-auto no-scrollbar">
+        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-1 flex items-center gap-1 overflow-x-auto no-scrollbar">
           {(['Todos', 'Maior', 'Menor', 'Diminutos', 'Aumentados', 'Tétrades', 'Extensões'] as const).map((q) => {
             const isActive = qualityFilter === q;
             return (
@@ -213,7 +213,7 @@ export function CompactChordDictionary({
         </div>
 
         {/* 🔹 #/b-tabs (Sustenido/Bemol) */}
-        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-[4px] flex items-center gap-[4px]">
+        <div className="w-full h-[40px] bg-white/[0.03] border border-white/5 rounded-[8px] p-1 flex items-center gap-1">
           {[
             { id: 'natural' as AccidentalType, label: 'Natural ♮' },
             { id: 'sharp' as AccidentalType, label: 'Sustenido ♯' },
@@ -237,7 +237,7 @@ export function CompactChordDictionary({
         </div>
 
         {/* 🔹 Seletor de Inversões (Harmonia Teórica) */}
-        <div className="w-full bg-[#0A090E] border border-white/10 rounded-[8px] p-[3px] flex items-center gap-[4px]">
+        <div className="w-full bg-[#0A090E] border border-white/10 rounded-[8px] p-1 flex items-center gap-1">
           {[
             { id: 'root' as const, label: 'Fundamental', tip: 'Tônica no baixo' },
             { id: '1st' as const, label: '1ª Inv (3ª)', tip: 'Baixo na terça' },
@@ -263,19 +263,19 @@ export function CompactChordDictionary({
         </div>
 
         {/* 🔹 Search input */}
-        <div className="relative w-full h-[40px]">
-          <Search className="w-[16px] h-[16px] text-[#A1A0AE] absolute left-[12px] top-1/2 -translate-y-1/2 pointer-events-none" />
+        <div className="relative w-full h-[42px]">
+          <Search className="w-[16px] h-[16px] text-[#A1A0AE] absolute left-3.5 top-1/2 -translate-y-1/2 pointer-events-none" />
           <input
             type="text"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             placeholder="Buscar variação (ex: 7M, m9, sus4, m7b5)..."
-            className="w-full h-[40px] bg-white/[0.027] border border-white/[0.07] rounded-[8px] pl-[38px] pr-[16px] py-[10px] text-[13px] text-[#F4F4F7] font-sans placeholder:text-[#6D6B7D] focus:outline-none focus:border-[#0FE49B]/60 transition-all"
+            className="w-full h-[42px] bg-white/[0.027] border border-white/[0.07] rounded-[8px] pl-10 pr-4 py-2 text-[13px] text-[#F4F4F7] font-sans placeholder:text-[#6D6B7D] focus:outline-none focus:border-[#0FE49B]/60 transition-all"
           />
         </div>
 
         {/* 🔹 Lista de variações */}
-        <div className="w-full max-h-[360px] overflow-y-auto pr-1 space-y-[4px] custom-scrollbar pt-1">
+        <div className="w-full max-h-[360px] overflow-y-auto pr-1 space-y-1.5 custom-scrollbar pt-1">
           {filteredVariations.length === 0 ? (
             <div className="w-full py-6 text-center text-[#6D6B7D] font-mono text-[12px] border border-dashed border-white/5 rounded-[8px]">
               Nenhuma variação encontrada para "{searchQuery}"
@@ -291,13 +291,13 @@ export function CompactChordDictionary({
                 <div
                   key={varName}
                   onClick={() => handleSelectChord(varName)}
-                  className={`w-full h-[38px] rounded-[8px] px-[10px] flex items-center justify-between border transition-all cursor-pointer group ${
+                  className={`w-full h-[42px] rounded-[8px] px-3.5 flex items-center justify-between border transition-all cursor-pointer group ${
                     isSelected
                       ? 'bg-[#0FE49B]/[0.08] border-[#0FE49B] shadow-[0_0_10px_rgba(15,228,155,0.15)]'
                       : 'bg-white/[0.03] border-white/5 hover:border-white/20 hover:bg-white/[0.06]'
                   }`}
                 >
-                  <div className="flex items-center gap-[10px] min-w-0">
+                  <div className="flex items-center gap-3 min-w-0">
                     <span className={`font-display font-bold text-[14px] ${isSelected ? 'text-[#0FE49B]' : 'text-[#F4F4F7]'}`}>
                       {fullChord}
                     </span>
@@ -306,13 +306,13 @@ export function CompactChordDictionary({
                     </span>
                   </div>
 
-                  <div className="flex items-center gap-[6px] shrink-0">
+                  <div className="flex items-center gap-2 shrink-0">
                     <span className="font-mono text-[10px] text-[#6D6B7D] hidden md:inline">
                       {intervals.join('-')}
                     </span>
                     <button
                       onClick={(e) => handlePlayChord(varName, e)}
-                      className="w-[26px] h-[26px] rounded-[6px] bg-white/[0.05] hover:bg-[#0FE49B] hover:text-[#0A090E] text-[#A1A0AE] transition-all flex items-center justify-center cursor-pointer"
+                      className="w-[28px] h-[28px] rounded-[6px] bg-white/[0.05] hover:bg-[#0FE49B] hover:text-[#0A090E] text-[#A1A0AE] transition-all flex items-center justify-center cursor-pointer"
                       title={`Ouvir ${fullChord}`}
                     >
                       <Play className="w-[12px] h-[12px] fill-current" />
@@ -322,7 +322,7 @@ export function CompactChordDictionary({
                         e.stopPropagation();
                         handleSelectChord(varName);
                       }}
-                      className="h-[26px] px-[8px] rounded-[6px] bg-[#0FE49B]/10 hover:bg-[#0FE49B] text-[#0FE49B] hover:text-[#0A090E] font-sans font-semibold text-[11px] transition-all flex items-center gap-1 cursor-pointer"
+                      className="h-[28px] px-2.5 rounded-[6px] bg-[#0FE49B]/10 hover:bg-[#0FE49B] text-[#0FE49B] hover:text-[#0A090E] font-sans font-semibold text-[11px] transition-all flex items-center gap-1 cursor-pointer"
                       title={`Projetar ${fullChord} no app`}
                     >
                       <span>Usar</span>

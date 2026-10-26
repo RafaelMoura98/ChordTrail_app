@@ -72,21 +72,21 @@ export function LiveMidiPianoCard({
   }, [startMidi, numKeys, useFlats, activeMidiNotes]);
 
   return (
-    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-[24px] space-y-[16px] shadow-lg relative overflow-hidden">
-      {/* 🔹 Header (64, 1493) */}
-      <div className="flex items-center justify-between w-full h-[22px]">
-        {/* Ícone keyboard-music + Título (Outfit SemiBold 16px, #F4F4F7) */}
-        <div className="flex items-center gap-[10px]">
+    <div className="w-full bg-[#16141D] border border-white/10 rounded-[16px] p-6 sm:p-7 space-y-5 shadow-lg relative overflow-hidden">
+      {/* 🔹 Header */}
+      <div className="flex items-center justify-between w-full">
+        {/* Ícone keyboard-music + Título */}
+        <div className="flex items-center gap-2.5">
           <div className="flex items-center text-[#0FE49B]">
             <Keyboard className="w-[18px] h-[18px]" />
           </div>
-          <h3 className="font-display font-semibold text-[16px] text-[#F4F4F7] leading-none">
+          <h3 className="font-display font-semibold text-[16px] text-[#F4F4F7] leading-tight">
             Teclado MIDI Ao Vivo
           </h3>
         </div>
 
         {/* Badge "Controlador Offline / Online" */}
-        <div className="w-[146px] h-[22px] rounded-full bg-white/[0.07] border border-white/10 flex items-center justify-center gap-[6px]">
+        <div className="h-[24px] px-3 rounded-full bg-white/[0.07] border border-white/10 flex items-center justify-center gap-2">
           {isConnected ? (
             <>
               <span className="w-[6px] h-[6px] rounded-full bg-[#0FE49B] shadow-[0_0_6px_#0FE49B] animate-pulse" />

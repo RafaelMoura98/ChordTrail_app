@@ -22,19 +22,19 @@ export function MidiConnectionCard({
   const isConnected = midiInputs.length > 0;
 
   return (
-    <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-[20px] space-y-[14px] shadow-lg relative overflow-hidden">
-      {/* 🔹 Título + Ícone CPU & Ícone Settings (470 × 20 | HORIZONTAL, gap:8) */}
-      <div className="flex items-center justify-between w-full h-[20px]">
-        <div className="flex items-center gap-[8px]">
+    <div className="w-full bg-[#16141D] border border-white/[0.07] rounded-[16px] p-5 sm:p-6 space-y-4 shadow-lg relative overflow-hidden">
+      {/* 🔹 Título + Ícone CPU & Ícone Settings */}
+      <div className="flex items-center justify-between w-full">
+        <div className="flex items-center gap-2.5">
           <Cpu className="w-[18px] h-[18px] text-[#0FE49B] shrink-0" />
-          <h3 className="font-display font-semibold text-[16px] text-[#F4F4F7] leading-none">
+          <h3 className="font-display font-semibold text-[16px] text-[#F4F4F7] leading-tight">
             Conexão MIDI
           </h3>
         </div>
 
         <button
           onClick={() => setShowSettings(!showSettings)}
-          className="text-[#A1A0AE] hover:text-[#F4F4F7] transition-colors p-0.5 cursor-pointer"
+          className="text-[#A1A0AE] hover:text-[#F4F4F7] transition-colors p-1 cursor-pointer"
           title="Configurações MIDI"
           aria-label="Configurações MIDI"
         >
@@ -46,49 +46,49 @@ export function MidiConnectionCard({
         </button>
       </div>
 
-      {/* 🔹 Error Box / Status Box (470 × 85 | rx:10) */}
+      {/* 🔹 Error Box / Status Box */}
       {!isSupported ? (
-        <div className="w-full min-h-[85px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[10px] p-[12px] flex flex-col justify-center space-y-[6px]">
-          <div className="flex items-center gap-[8px] text-[#FCA5A5]">
+        <div className="w-full min-h-[85px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[10px] p-3.5 flex flex-col justify-center space-y-1.5">
+          <div className="flex items-center gap-2 text-[#FCA5A5]">
             <AlertTriangle className="w-[16px] h-[16px] text-[#EF4444] shrink-0" />
-            <span className="font-sans font-semibold text-[13px] text-[#FCA5A5] leading-none">
+            <span className="font-sans font-semibold text-[13px] text-[#FCA5A5] leading-tight">
               Navegador Incompatível
             </span>
           </div>
-          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-[17px]">
+          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-normal">
             Seu navegador não suporta a Web MIDI API. Use o Google Chrome ou Microsoft Edge.
           </p>
         </div>
       ) : !isConnected ? (
-        /* Error Box: Nenhum teclado detectado (470 × 85 | fill: #EF4444 @ 5%, stroke: #EF4444, rx:10) */
-        <div className="w-full min-h-[85px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[10px] p-[12px] flex flex-col justify-center space-y-[6px]">
-          <div className="flex items-center gap-[8px]">
+        /* Error Box: Nenhum teclado detectado */
+        <div className="w-full min-h-[85px] bg-[#EF4444]/[0.05] border border-[#EF4444] rounded-[10px] p-3.5 flex flex-col justify-center space-y-1.5">
+          <div className="flex items-center gap-2">
             <AlertTriangle className="w-[16px] h-[16px] text-[#EF4444] shrink-0" />
-            <span className="font-sans font-semibold text-[13px] text-[#FCA5A5] leading-none">
+            <span className="font-sans font-semibold text-[13px] text-[#FCA5A5] leading-tight">
               Nenhum teclado MIDI detectado
             </span>
           </div>
-          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-[17px]">
+          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-normal">
             Conecte seu controlador via USB. Ao tocar, as notas acendem automaticamente na tela.
           </p>
         </div>
       ) : (
-        /* Status Box: Controlador Conectado (fill: #0FE49B @ 5%, stroke: #0FE49B @ 50%, rx:10) */
-        <div className="w-full min-h-[85px] bg-[#0FE49B]/[0.05] border border-[#0FE49B]/50 rounded-[10px] p-[12px] flex flex-col justify-center space-y-[6px]">
+        /* Status Box: Controlador Conectado */
+        <div className="w-full min-h-[85px] bg-[#0FE49B]/[0.05] border border-[#0FE49B]/50 rounded-[10px] p-3.5 flex flex-col justify-center space-y-1.5">
           <div className="flex items-center justify-between">
-            <div className="flex items-center gap-[8px]">
+            <div className="flex items-center gap-2">
               <CheckCircle2 className="w-[16px] h-[16px] text-[#0FE49B] shrink-0" />
-              <span className="font-sans font-semibold text-[13px] text-[#0FE49B] leading-none">
+              <span className="font-sans font-semibold text-[13px] text-[#0FE49B] leading-tight">
                 Controlador MIDI Conectado
               </span>
             </div>
             {midiNotesPressed.length > 0 && (
-              <span className="px-2 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#0FE49B] text-[#0A090E]">
+              <span className="px-2.5 py-0.5 rounded-full text-[10px] font-mono font-bold bg-[#0FE49B] text-[#0A090E]">
                 {midiNotesPressed.length} {midiNotesPressed.length === 1 ? 'tecla' : 'teclas'}
               </span>
             )}
           </div>
-          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-[17px] truncate">
+          <p className="font-sans font-normal text-[12px] text-[#A1A0AE] leading-normal truncate">
             Dispositivo: {midiInputs.find((i) => i.id === selectedMidiInputId)?.name || midiInputs[0]?.name || 'Controlador USB'}
           </p>
         </div>
